@@ -1,0 +1,1368 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>MecaTeam</title>
+</head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+/* Layout: app de planta — barra de pestañas en el móvil, carril lateral oscuro en escritorio; placas de código como las de las máquinas */
+:root{
+--bg:#EEF1F4; --surface:#FFFFFF; --sunk:#E4E9EE; --ink:#16202A; --ink-2:#4A5763; --muted:#6C7986; --line:#D5DCE3;
+--hdr:#16202A; --on-hdr:#FFFFFF; --on-hdr-2:#9FB0BF;
+--accent:#F5B700; --accent-ink:#16202A; --accent-soft:#FFF2C2;
+--red:#C9372C; --orange:#C9661A; --green:#1B8653; --blue:#2A63CC; --violet:#7650C2; --teal:#1C8794;
+--mine:#FFF2C2; --on-sem:#FFFFFF; --shadow:0 1px 2px rgba(22,32,42,.06),0 4px 14px rgba(22,32,42,.06);
+--f-disp:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+--f-body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
+--f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+--r:12px; --tab:64px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+--bg:#0E151C; --surface:#16212B; --sunk:#1D2A36; --ink:#E6ECF1; --ink-2:#B1BDC8; --muted:#8392A0; --line:#2A3846;
+--hdr:#0A1015; --on-hdr:#FFFFFF; --on-hdr-2:#8FA0AF;
+--accent:#F5B700; --accent-ink:#16202A; --accent-soft:#3A3010;
+--red:#F2685C; --orange:#F09A52; --green:#3CC487; --blue:#78A3F2; --violet:#AC8CEA; --teal:#4CC0CD;
+--mine:#3A3010; --on-sem:#0E151C; --shadow:0 1px 2px rgba(0,0,0,.3);
+color-scheme:dark}}
+:root[data-theme="dark"]{
+--bg:#0E151C; --surface:#16212B; --sunk:#1D2A36; --ink:#E6ECF1; --ink-2:#B1BDC8; --muted:#8392A0; --line:#2A3846;
+--hdr:#0A1015; --on-hdr:#FFFFFF; --on-hdr-2:#8FA0AF;
+--accent:#F5B700; --accent-ink:#16202A; --accent-soft:#3A3010;
+--red:#F2685C; --orange:#F09A52; --green:#3CC487; --blue:#78A3F2; --violet:#AC8CEA; --teal:#4CC0CD;
+--mine:#3A3010; --on-sem:#0E151C; --shadow:0 1px 2px rgba(0,0,0,.3);
+color-scheme:dark}
+html,body{background:var(--bg)}
+body{color:var(--ink);font:15px/1.45 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--hdr)}
+*{box-sizing:border-box}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+h1,h2,h3{text-wrap:balance;margin:0}
+.num{font-variant-numeric:tabular-nums}
+/* Shell */
+.shell{min-height:100%}
+.side{display:none}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--hdr);color:var(--on-hdr);
+display:flex;align-items:center;gap:8px;height:56px;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+.top h1{font:700 22px/1 var(--f-disp);letter-spacing:.3px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .ib{width:40px;height:40px;border:0;background:transparent;color:var(--on-hdr);border-radius:10px;display:grid;place-items:center}
+.top .ib:hover{background:rgba(255,255,255,.08)}
+.top .brandmini{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none}
+.logo svg{width:20px;height:20px}
+.main{padding-block:16px 140px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1120px;margin:0 auto}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);
+display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom,0px);
+padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.tabs button{border:0;background:transparent;height:var(--tab);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+font:600 11px/1 var(--f-body);color:var(--muted);position:relative}
+.tabs button.on{color:var(--ink)}
+.tabs button.on::before{content:"";position:absolute;top:0;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;background:var(--accent)}
+.tabs .cnt,.nav .cnt{position:absolute;top:8px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font:700 11px/18px var(--f-body);text-align:center}
+@media (min-width:960px){
+.shell{display:grid;grid-template-columns:244px minmax(0,1fr)}
+.side{display:flex;flex-direction:column;position:sticky;top:0;height:100vh;background:var(--hdr);color:var(--on-hdr);padding:18px 12px;gap:4px;overflow:auto}
+.side .brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.side .brand b{font:700 26px/1 var(--f-disp);letter-spacing:.4px}
+.side .brand small{display:block;color:var(--on-hdr-2);font-size:12px;margin-top:2px}
+.nav{border:0;background:transparent;color:var(--on-hdr-2);display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;font-weight:600;text-align:left;position:relative}
+.nav:hover{background:rgba(255,255,255,.06);color:var(--on-hdr)}
+.nav.on{background:rgba(245,183,0,.14);color:var(--on-hdr)}
+.nav.on svg{color:var(--accent)}
+.nav .cnt{position:static;margin-left:auto}
+.side .sep{height:1px;background:rgba(255,255,255,.08);margin:10px 4px}
+.side .who{margin-top:auto;display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,.05);color:var(--on-hdr);text-align:left}
+.side .who small{display:block;color:var(--on-hdr-2);font-size:12px}
+.tabs{display:none}
+.top{background:var(--bg);color:var(--ink);height:64px;border-bottom:1px solid var(--line);padding-left:24px;padding-right:24px}
+.top .ib{color:var(--ink)} .top .ib:hover{background:var(--sunk)}
+.top .brandmini .logo,.top .meav{display:none}
+.top h1{font-size:28px}
+body::before{background:var(--bg)}
+.main{padding-block:24px 80px;padding-left:28px;padding-right:28px}
+}
+/* Banners */
+.banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:var(--r);margin-bottom:14px;font-size:14px;
+background:var(--accent-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+.banner.soft{background:var(--sunk);border-color:var(--line)}
+.banner span{flex:1;min-width:200px}
+/* Generic */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--shadow)}
+.card.tap{cursor:pointer;transition:transform .08s,border-color .15s}
+.card.tap:hover{border-color:color-mix(in srgb,var(--ink) 25%,var(--line))}
+.card.tap:active{transform:scale(.995)}
+.stack{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.row.nw{flex-wrap:nowrap}
+.grow{flex:1;min-width:0}
+.sec{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 10px}
+.sec h2{font:700 13px/1 var(--f-body);text-transform:uppercase;letter-spacing:.7px;color:var(--ink-2)}
+.sec .lnk{border:0;background:none;color:var(--blue);font-weight:600;font-size:14px;padding:4px}
+.t{font-weight:600;font-size:16px;line-height:1.3}
+.sub{color:var(--muted);font-size:13px}
+.body{white-space:pre-wrap;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;color:var(--ink-2);font-size:13px}
+.meta span{display:inline-flex;align-items:center;gap:4px}
+.meta svg.i{width:14px;height:14px;color:var(--muted)}
+.badge{--c:var(--muted);display:inline-flex;align-items:center;gap:5px;padding:2px 8px 2px 7px;border-radius:999px;font:600 12px/18px var(--f-body);
+color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent);white-space:nowrap}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
+.badge.haz{color:#16202A;background:repeating-linear-gradient(-45deg,#F5B700 0 7px,#16202A 7px 14px);padding:2px 8px}
+.badge.haz::before{display:none}
+.badge.haz b{background:#F5B700;padding:0 5px;border-radius:4px}
+.plate{background:var(--hdr);color:var(--accent);font:600 14px/1 var(--f-mono);letter-spacing:.5px;padding:9px 8px;border-radius:8px;min-width:68px;text-align:center;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);flex:none}
+.plate.lg{font-size:18px;padding:10px 12px}
+.av{border-radius:50%;display:grid;place-items:center;color:#fff;font:700 13px/1 var(--f-body);flex:none;width:32px;height:32px}
+.empty{text-align:center;padding:36px 16px;color:var(--muted)}
+.empty svg.i{width:40px;height:40px;stroke-width:1.5}
+.empty .t{color:var(--ink-2);margin-top:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border-radius:10px;border:1px solid var(--line);
+background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;text-decoration:none}
+.btn:hover{border-color:color-mix(in srgb,var(--ink) 30%,var(--line))}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.dan{background:var(--red);border-color:var(--red);color:#fff}
+.btn.ok{background:var(--green);border-color:var(--green);color:#fff}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--blue)}
+.btn.sm{min-height:34px;padding:6px 12px;font-size:14px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.55;cursor:default}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btns>.btn{flex:1 1 150px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-right:-16px;padding-right:16px}
+.chip{--c:var(--accent);border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:7px 13px;font-weight:600;font-size:14px;white-space:nowrap}
+.chip.on{background:var(--c);border-color:var(--c);color:var(--on-sem)}
+.chip.on:not([style]){color:var(--accent-ink)}
+.fld{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.fld>label,.lbl{font:700 12px/1 var(--f-body);text-transform:uppercase;letter-spacing:.6px;color:var(--ink-2)}
+.inp{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:16px;min-height:46px}
+textarea.inp{min-height:96px;resize:vertical}
+.inp:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
+.hint{font-size:12px;color:var(--muted)}
+.search{position:relative}
+.search svg{position:absolute;left:12px;top:13px;color:var(--muted)}
+.search .inp{padding-left:40px}
+.toggle{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:100%;text-align:left}
+.toggle .sw{width:42px;height:24px;border-radius:12px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.toggle.on .sw{background:var(--green)} .toggle.on .sw::after{left:21px}
+.toggle.on.red .sw{background:var(--red)}
+.fab{position:fixed;right:max(18px,calc(env(safe-area-inset-right,0px) + 12px));bottom:calc(var(--tab) + 16px + env(safe-area-inset-bottom,0px));z-index:25;
+display:flex;align-items:center;gap:8px;height:54px;padding:0 20px 0 16px;border-radius:27px;border:0;background:var(--accent);color:var(--accent-ink);
+font:700 15px/1 var(--f-body);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+@media (min-width:960px){.fab{bottom:28px;right:32px}}
+.info{display:grid;grid-template-columns:auto 118px minmax(0,1fr);gap:8px;align-items:start;padding:7px 0;font-size:14px;border-bottom:1px solid var(--line)}
+.info:last-child{border-bottom:0}
+.info svg.i{width:17px;height:17px;color:var(--muted);margin-top:1px}
+.info .k{color:var(--muted)}
+.info .v{font-weight:600;overflow-wrap:anywhere}
+.lk{color:var(--blue);font-weight:600;cursor:pointer;background:none;border:0;padding:0;text-align:left}
+/* Fault & machine cards */
+.fault{border-left:5px solid var(--pc,var(--muted))}
+.fault .top-row{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:6px}
+.fault .bs{display:flex;gap:6px;flex-wrap:wrap}
+.mcard{display:flex;align-items:center;gap:12px}
+.mcard .chev{color:var(--muted)}
+/* Dashboard */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:720px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{--c:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;text-align:left;display:flex;flex-direction:column;gap:2px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.tile .n{font:700 40px/1 var(--f-disp);color:var(--c)}
+.tile .l{font-weight:600;font-size:14px}
+.tile .s{font-size:12px;color:var(--muted)}
+.tile.alert{border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
+.tile.alert::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+.hello{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.hello h2{font:700 32px/1.05 var(--f-disp)}
+.hello .d{color:var(--muted);font-size:14px}
+.hello .d::first-letter{text-transform:uppercase}
+.cols{display:grid;gap:0 24px}
+@media (min-width:900px){.cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.qa .btn{min-height:52px}
+.goto{display:flex;gap:8px;margin-top:10px}
+.goto .inp{font-family:var(--f-mono)}
+.goto .inp::placeholder{font-family:var(--f-body)}
+.feed{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.feed:last-child{border-bottom:0}
+.feed .dot{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.feed .dot svg{width:16px;height:16px}
+.due{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.due:last-child{border-bottom:0}
+.due .dd{font:700 20px/1 var(--f-disp);min-width:58px;text-align:right;color:var(--c)}
+.due .dd small{display:block;font:500 11px/1.2 var(--f-body);color:var(--muted)}
+/* Detail */
+.dhead{display:flex;gap:14px;align-items:flex-start}
+.dhead h2{font:700 26px/1.1 var(--f-disp);margin-top:8px}
+.qr{background:#fff;padding:6px;border-radius:8px;width:112px;height:112px;flex:none;border:1px solid var(--line)}
+.qr svg{display:block;width:100%;height:100%}
+.qr .ph{width:100%;height:100%;display:grid;place-items:center;color:#7A8794;font-size:11px;text-align:center}
+.photos{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.photos img,.photos .ph{width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--sunk);flex:none;cursor:zoom-in}
+.pp{display:flex;gap:8px;flex-wrap:wrap}
+.pp .th{position:relative;width:84px;height:84px}
+.pp .th img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.pp .th button{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:50%;border:0;background:var(--ink);color:var(--surface);display:grid;place-items:center}
+.pp .th button svg{width:14px;height:14px}
+.pp .add{width:84px;height:84px;border:1.5px dashed var(--line);border-radius:10px;display:grid;place-items:center;color:var(--muted);background:transparent;cursor:pointer}
+.log{position:relative;padding-left:18px}
+.log::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.log div{position:relative;padding:4px 0;font-size:14px}
+.log div::before{content:"";position:absolute;left:-17px;top:10px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--muted)}
+.log small{color:var(--muted)}
+/* Chat */
+.chat{display:flex;flex-direction:column;gap:2px;padding-bottom:8px}
+.day{align-self:center;font-size:12px;font-weight:700;color:var(--ink-2);background:var(--sunk);padding:3px 10px;border-radius:10px;margin:12px 0 6px}
+.msg{display:flex;gap:8px;align-items:flex-end;margin:2px 0}
+.msg.me{justify-content:flex-end}
+.bub{max-width:min(80%,520px);background:var(--surface);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:8px 11px;display:flex;flex-direction:column;gap:4px}
+.msg.me .bub{background:var(--mine);border-color:color-mix(in srgb,var(--accent) 40%,transparent);border-radius:14px 14px 4px 14px;cursor:pointer}
+.bub .who{font-size:13px;font-weight:700;color:var(--blue)}
+.bub .tx{white-space:pre-wrap;overflow-wrap:anywhere}
+.bub .tm{font-size:11px;color:var(--muted);align-self:flex-end}
+.bub img{border-radius:10px;max-width:260px;width:100%;cursor:zoom-in}
+.sys{align-self:center;max-width:92%;display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink-2);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:7px 11px;margin:6px 0;cursor:pointer}
+.sys svg.i{width:16px;height:16px;margin-top:1px}
+.composer{position:sticky;bottom:calc(var(--tab) + env(safe-area-inset-bottom,0px));background:var(--bg);padding-top:8px;padding-bottom:10px;z-index:5}
+@media (min-width:960px){.composer{bottom:0}}
+.main.chatv{padding-bottom:calc(var(--tab) + env(safe-area-inset-bottom,0px))}
+@media (min-width:960px){.main.chatv{padding-bottom:0}}
+.composer .box{display:flex;gap:8px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:5px}
+.composer textarea{flex:1;border:0;background:transparent;resize:none;padding:9px 6px;max-height:140px;min-height:40px;font-size:16px;outline:none}
+.composer .ib{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:var(--ink-2);display:grid;place-items:center;flex:none}
+.composer .send{background:var(--accent);color:var(--accent-ink)}
+.composer .send[disabled]{opacity:.45}
+.delm{border:0;background:var(--red);color:#fff;border-radius:8px;font-size:12px;font-weight:700;padding:4px 8px;align-self:flex-end}
+/* Calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal .wd{font:700 11px/1 var(--f-body);text-transform:uppercase;letter-spacing:.5px;color:var(--muted);text-align:center;padding:6px 0}
+.cal button{min-height:58px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:5px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left}
+.cal button.out{opacity:.35}
+.cal button.today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.cal button.sel{background:var(--hdr);color:var(--on-hdr);border-color:var(--hdr)}
+.cal .dn{font:700 16px/1 var(--f-disp)}
+.cal .dots{display:flex;gap:3px;flex-wrap:wrap}
+.cal .dots i{width:7px;height:7px;border-radius:50%;background:var(--c)}
+.cal .dots i.pj{background:transparent;border:1.5px solid var(--c)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.legend i.pj{background:transparent;border:1.5px solid var(--c)}
+.calhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.calhead h2{font:700 26px/1 var(--f-disp);flex:1;text-transform:capitalize}
+/* Reports */
+.bars{display:flex;flex-direction:column;gap:9px}
+.bar{display:grid;grid-template-columns:minmax(80px,38%) minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14px}
+.bar .bl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .bt{height:12px;background:var(--sunk);border-radius:6px;overflow:hidden}
+.bar .bt i{display:block;height:100%;border-radius:6px}
+.bar .bv{font:600 13px/1 var(--f-mono);color:var(--ink-2);min-width:52px;text-align:right}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:720px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.kpi .n{font:700 34px/1 var(--f-disp)}
+.kpi .n small{font:600 15px/1 var(--f-body);color:var(--muted);margin-left:3px}
+.kpi .l{font-size:13px;color:var(--muted);margin-top:4px}
+.grid2{display:grid;gap:12px}
+@media (min-width:900px){.grid2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+/* Team */
+.member{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.member:last-child{border-bottom:0}
+.me-card{display:flex;align-items:center;gap:14px}
+.me-card .av{width:60px;height:60px;font-size:22px}
+/* Overlays */
+.ov{position:fixed;inset:0;z-index:60;background:rgba(8,12,16,.55);display:flex;align-items:flex-end;justify-content:center;padding:0}
+@media (min-width:640px){.ov{align-items:center;padding:24px}}
+.sheet{background:var(--bg);width:100%;max-width:520px;max-height:90vh;overflow:auto;border-radius:18px 18px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px))}
+@media (min-width:640px){.sheet{border-radius:18px}}
+.sheet h3{font:700 24px/1.1 var(--f-disp);margin-bottom:6px}
+.sheet p{margin:0 0 14px;color:var(--ink-2)}
+.pick{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:1px solid var(--line);background:var(--surface);border-radius:10px;text-align:left;margin-bottom:8px}
+.lb{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.9);display:grid;place-items:center;padding:20px}
+.lb img{max-width:100%;max-height:100%;border-radius:8px}
+.lb button{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.15);color:#fff;display:grid;place-items:center}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tab) + 86px + env(safe-area-inset-bottom,0px));z-index:80;background:var(--ink);color:var(--surface);
+padding:11px 16px;border-radius:10px;font-weight:600;font-size:14px;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.toast.err{background:var(--red);color:#fff}
+@media (min-width:960px){.toast{bottom:28px}}
+.skel{height:76px;border-radius:var(--r);background:linear-gradient(90deg,var(--sunk),var(--surface),var(--sunk));background-size:200% 100%;animation:sk 1.2s infinite linear;margin-bottom:10px}
+@keyframes sk{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+body.ro [data-w]{display:none!important}
+textarea.csv{width:100%;min-height:220px;font:12px/1.4 var(--f-mono)}
+/* Pulido v2 */
+.main.enter>*{animation:enter .22s ease-out both}
+@keyframes enter{from{opacity:0;transform:translateY(6px)}}
+.ov{animation:fade .15s ease-out}
+.sheet{animation:up .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes fade{from{opacity:0}}
+@keyframes up{from{transform:translateY(24px);opacity:.4}}
+.toast{animation:up .18s ease-out}
+.lblrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mic{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);display:grid;place-items:center;flex:none;position:relative}
+.mic svg.i{width:17px;height:17px}
+.mic.on{background:var(--red);border-color:var(--red);color:#fff}
+.mic.on::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--red);animation:pulse 1.2s ease-out infinite}
+@keyframes pulse{from{opacity:.8;transform:scale(.9)}to{opacity:0;transform:scale(1.35)}}
+.composer .mic{width:40px;height:40px;border:0;background:transparent}
+.composer .mic.on{background:var(--red)}
+.log div.note{background:var(--sunk);border-radius:10px;padding:8px 10px;margin:4px 0}
+.log div.note::before{background:var(--accent);border-color:var(--accent)}
+.log div.note .nb{white-space:pre-wrap;overflow-wrap:anywhere;display:block}
+.notebox{display:flex;gap:8px;align-items:flex-end;margin-top:12px}
+.notebox textarea{min-height:46px}
+.member.tap{cursor:pointer;border-radius:8px}
+.member.tap:hover{background:var(--sunk)}
+.toggle[disabled]{opacity:.5;cursor:default}
+.tile{transition:transform .08s,border-color .15s}
+.tile:hover{border-color:color-mix(in srgb,var(--c) 40%,var(--line))}
+.tile:active{transform:scale(.98)}
+.chip{transition:background .12s,border-color .12s,color .12s}
+.btn{transition:filter .12s,border-color .12s}
+.btn.pri:hover,.btn.dan:hover,.btn.ok:hover{filter:brightness(1.06)}
+.btn:active:not([disabled]){transform:translateY(1px)}
+.empty .btn{margin-top:14px}
+.hdr-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+</style>
+<div class="shell">
+<aside class="side" id="side"></aside>
+<div class="col">
+<header class="top" id="top"></header>
+<main class="main" id="main"><div class="skel"></div><div class="skel"></div><div class="skel"></div></main>
+</div>
+</div>
+<nav class="tabs" id="tabs" aria-label="Secciones"></nav>
+<div id="ovl"></div>
+<script>window.MECATEAM_CFG={url:"https://hrabiqxgfuxflsmsyjlz.supabase.co",key:"sb_publishable_y1GuXv_Z4o24HAxWIHELZQ_RTVjOON-"};</script>
+<script>
+/* MecaTeam fuera de Claude: sustituye db/assets/downloads de Claude por Supabase (REST) con código de equipo */
+(function(){
+var CFG=window.MECATEAM_CFG||{};
+var BASE=String(CFG.url||'').replace(/\/+$/,'');
+function lsg(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lss(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+var code=lsg('mecateam-code')||'';
+function hdr(extra){
+var h={apikey:CFG.key,'x-team-code':code};
+if(/^eyJ/.test(CFG.key||''))h.Authorization='Bearer '+CFG.key;
+for(var k in (extra||{}))h[k]=extra[k];return h;
+}
+function err(status,msg){var e=new Error(msg||('HTTP '+status));e.status=status;e.code=(status===401||status===403)?'denied':(status===413?'quota_exceeded':(status===429?'resource_exhausted':'unavailable'));return e}
+async function api(path,opt){
+opt=opt||{};var r=await fetch(BASE+path,{method:opt.method||'GET',headers:hdr(opt.headers),body:opt.body});
+if(!r.ok){var t='';try{t=await r.text()}catch(e){}throw err(r.status,t.slice(0,200))}
+var ct=r.headers.get('content-type')||'';return ct.indexOf('json')>=0?r.json():r.text();
+}
+/* ---------- puerta con código de equipo ---------- */
+function gate(){
+return new Promise(function(resolve){
+async function check(){
+try{var ok=await api('/rest/v1/rpc/team_ok',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});return ok===true}catch(e){if(e.status===0||!e.status)throw e;return false}
+}
+async function start(msg){
+var ok=false;
+try{ok=code?await check():false}catch(e){ok=null}
+if(ok===true)return resolve();
+if(ok===null&&code){/* sin conexión: seguimos con lo que haya */ return resolve()}
+ask(msg);
+}
+function ask(msg){
+var d=document.createElement('div');d.id='codegate';
+d.style.cssText='position:fixed;inset:0;z-index:999;background:#16202A;display:grid;place-items:center;padding:20px;font-family:"IBM Plex Sans",system-ui,sans-serif';
+d.innerHTML='<form style="background:#fff;color:#16202A;border-radius:16px;padding:22px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:12px">'+
+'<div style="font:700 28px/1 \'Barlow Condensed\',Arial Narrow,sans-serif">MecaTeam</div>'+
+'<div style="color:#4A5763;font-size:15px">Escribe el código del equipo para entrar.</div>'+
+'<input id="cgi" type="password" autocomplete="current-password" placeholder="Código del equipo" style="font-size:16px;padding:12px;border:1px solid #D5DCE3;border-radius:10px;min-height:46px" required>'+
+'<div id="cgm" style="color:#C9372C;font-size:14px;min-height:18px"></div>'+
+'<button type="submit" style="background:#F5B700;border:0;border-radius:10px;min-height:46px;font:700 16px inherit;cursor:pointer">Entrar</button></form>';
+document.body.appendChild(d);
+var m=d.querySelector('#cgm');if(msg)m.textContent=msg;
+var i=d.querySelector('#cgi');setTimeout(function(){i.focus()},50);
+d.querySelector('form').onsubmit=async function(ev){
+ev.preventDefault();code=i.value.trim();m.textContent='Comprobando…';
+try{if(await check()){lss('mecateam-code',code);d.remove();resolve()}else{m.textContent='Código incorrecto.';code=''}}
+catch(e){m.textContent='No hay conexión. Inténtalo de nuevo.'}
+};
+}
+start('');
+});
+}
+/* ---------- base de datos ---------- */
+var cache={};      // col -> {id:data}
+var subs={};       // col -> [cb]
+var loadedOnce={};
+var cursor='1970-01-01T00:00:00+00:00';
+var polling=false,timer=0;
+function snapOf(col){var m=cache[col]||{};return{docs:Object.keys(m).map(function(id){return{id:id,data:function(){return m[id]}}})}}
+function notify(cols){cols.forEach(function(c){(subs[c]||[]).forEach(function(cb){try{cb(snapOf(c))}catch(e){console.error(e)}})})}
+async function poll(){
+if(polling)return;polling=true;
+try{
+var touched={};var more=true,guard=0;
+while(more&&guard++<20){
+var rows=await api('/rest/v1/docs?select=collection,id,data,deleted,updated_at&updated_at=gte.'+encodeURIComponent(cursor)+'&order=updated_at.asc&limit=1000');
+rows.forEach(function(r){
+var m=cache[r.collection]||(cache[r.collection]={});
+if(r.deleted){if(m[r.id]){delete m[r.id];touched[r.collection]=1}}
+else{var s=JSON.stringify(r.data);if(!m[r.id]||JSON.stringify(m[r.id])!==s){m[r.id]=r.data;touched[r.collection]=1}}
+cursor=r.updated_at;
+});
+more=rows.length>=1000;
+}
+Object.keys(subs).forEach(function(c){if(!loadedOnce[c]){loadedOnce[c]=1;touched[c]=1}});
+notify(Object.keys(touched));
+}catch(e){
+Object.keys(subs).forEach(function(c){if(!loadedOnce[c]){loadedOnce[c]=1;notify([c])}});
+if(e&&e.code==='denied'){code='';lss('mecateam-code','');location.reload()}
+}finally{polling=false}
+}
+function startPolling(){if(timer)return;timer=setInterval(function(){if(!document.hidden)poll()},4000);document.addEventListener('visibilitychange',function(){if(!document.hidden)poll()})}
+async function write(col,id,data,deleted){
+await api('/rest/v1/docs?on_conflict=collection,id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},
+body:JSON.stringify([{collection:col,id:id,data:data,deleted:!!deleted}])});
+var m=cache[col]||(cache[col]={});if(deleted)delete m[id];else m[id]=data;notify([col]);
+}
+function clean(o){return JSON.parse(JSON.stringify(o,function(k,v){return v===undefined?null:v}))}
+function collection(col){
+var q={
+orderBy:function(){return q},limit:function(){return q},
+onSnapshot:function(cb,eb){(subs[col]=subs[col]||[]).push(cb);if(loadedOnce[col])cb(snapOf(col));else poll();return function(){}},
+doc:function(id){return{
+set:function(d){return write(col,id,clean(d),false)},
+update:function(d){var cur=(cache[col]||{})[id]||{};return write(col,id,clean(Object.assign({},cur,d)),false)},
+delete:function(){return write(col,id,{},true)}
+}}
+};return q;
+}
+var DB={collection:collection};
+/* ---------- fotos ---------- */
+var ASSETS={upload:async function(blob,opt){
+var id=Date.now().toString(36)+Math.random().toString(36).slice(2,10)+'.jpg';
+var r=await fetch(BASE+'/storage/v1/object/photos/'+id,{method:'POST',headers:hdr({'Content-Type':(opt&&opt.type)||'image/jpeg','x-upsert':'false'}),body:blob});
+if(!r.ok)throw err(r.status);return{id:id};
+}};
+window.blobUrl=function(id){return BASE+'/storage/v1/object/public/photos/'+encodeURIComponent(id)};
+/* ---------- descargas ---------- */
+var DL={save:async function(o){
+var blob=o.data instanceof Blob?o.data:new Blob([o.data],{type:'text/csv;charset=utf-8'});
+var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=o.filename;document.body.appendChild(a);a.click();
+setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
+}};
+var ready=null;
+function init(){return ready||(ready=gate().then(function(){startPolling();return true}))}
+window.claude={use:async function(name){
+if(name==='db'){await init();return DB}
+if(name==='assets'){await init();return ASSETS}
+if(name==='downloads')return DL;
+throw new Error('no disponible');
+}};
+})();
+</script>
+<script>
+"use strict";
+/* ---------- constantes ---------- */
+const ART_URL=location.href.split('#')[0];
+const DAY=864e5, HOUR=36e5;
+const COLS=['team','machines','maintenances','faults','messages'];
+const MAINT_TYPES=['Preventivo','Correctivo','Predictivo','Mejora','Ajuste','Limpieza'];
+const MT_C={Preventivo:'green',Correctivo:'red',Predictivo:'blue',Mejora:'violet',Ajuste:'orange',Limpieza:'teal'};
+const PRIOS=['Baja','Media','Alta','Urgente'];
+const PR_C={Baja:'muted',Media:'blue',Alta:'orange',Urgente:'red'};
+const STATUSES=['Abierta','En curso','Cerrada'];
+const ST_C={Abierta:'red','En curso':'orange',Cerrada:'green'};
+const NEXT=[['Sin fecha',0],['1 semana',7],['1 mes',30],['3 meses',91],['6 meses',182],['1 año',365]];
+const AV_C=['#2A63CC','#1B8653','#7650C2','#C9661A','#1C8794','#C9372C','#5C6F82'];
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+/* ---------- utilidades ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const sod=ms=>{const d=new Date(ms);d.setHours(0,0,0,0);return d.getTime()};
+const fmtD=ms=>{if(!ms)return'—';const d=new Date(ms);return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()};
+const fmtT=ms=>{const d=new Date(ms);return pad(d.getHours())+':'+pad(d.getMinutes())};
+const fmtDT=ms=>ms?fmtD(ms)+' '+fmtT(ms):'—';
+const daysUntil=ms=>ms?Math.round((sod(ms)-sod(Date.now()))/DAY):null;
+function fmtRel(ms){if(!ms)return'—';const l=Math.round((sod(Date.now())-sod(ms))/DAY);
+if(l===0)return'hoy '+fmtT(ms);if(l===1)return'ayer '+fmtT(ms);if(l>1&&l<7)return'hace '+l+' días';return fmtD(ms)}
+function dur(ms){if(ms==null||ms<0)return'—';const m=Math.round(ms/6e4);if(m<60)return m+' min';const h=Math.floor(m/60);
+if(h<48)return h+' h'+(m%60&&h<10?' '+(m%60)+' min':'');return Math.floor(h/24)+' d '+(h%24)+' h'}
+const hrs=min=>(min/60).toLocaleString('es-ES',{maximumFractionDigits:1});
+function longDate(ms){const d=new Date(ms);return DIAS[d.getDay()]+' '+d.getDate()+' de '+MESES[d.getMonth()]}
+function initials(n){return String(n||'?').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'?'}
+function avColor(n){let h=0;for(const c of String(n||''))h=(31*h+c.charCodeAt(0))>>>0;return AV_C[h%AV_C.length]}
+const av=(name,size)=>`<span class="av" style="background:${avColor(name)}${size?`;width:${size}px;height:${size}px;font-size:${Math.round(size*.38)}px`:''}">${esc(initials(name))}</span>`;
+const badge=(l,c,cls='')=>`<span class="badge ${cls}" style="--c:var(--${c})">${esc(l)}</span>`;
+const plural=(n,a,b)=>n+' '+(n===1?a:b);
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+/* ---------- iconos ---------- */
+const P={
+home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.7A8 8 0 1 1 21 12z"/>',
+alert:'<path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.5v.01"/>',
+wrench:'<path d="M14.5 3.5a5 5 0 0 0-4.3 7.2L3.5 17.4l3.1 3.1 6.7-6.7a5 5 0 0 0 7.2-4.3l-3 3-3.3-.8-.8-3.3z"/>',
+chip:'<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/><rect x="9" y="9" width="6" height="6" rx="1"/>',
+cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+chart:'<path d="M3 21h18M6 17v-6M11 17V5M16 17v-9M21 17v-3"/>',
+users:'<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4.2a4 4 0 0 1 0 7.6M18 14.5a6.5 6.5 0 0 1 4 6.5"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',
+search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+camera:'<path d="M3 8.5h3.5l2-3h7l2 3H21V20H3z"/><circle cx="12" cy="13.5" r="3.5"/>',
+qr:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20.5h.01M17.5 17.5H21V21h-3.5z"/>',
+check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+back:'<path d="M15 5l-7 7 7 7"/>',
+chev:'<path d="M9 5l7 7-7 7"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+userplus:'<circle cx="10" cy="8" r="4"/><path d="M3 21a7 7 0 0 1 14 0M19 8v6M16 11h6"/>',
+box:'<path d="M3 7.5l9-4 9 4-9 4z"/><path d="M3 7.5v9l9 4 9-4v-9M12 11.5v9"/>',
+download:'<path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/>',
+trash:'<path d="M4 7h16M9.5 7V4h5v3M6 7l1 13h10l1-13"/>',
+stop:'<path d="M8.2 3h7.6L21 8.2v7.6L15.8 21H8.2L3 15.8V8.2z"/><path d="M8.5 12h7"/>',
+send:'<path d="M4 12l16-8-6.5 16-2.6-6.7z"/>',
+edit:'<path d="M4 20h4L19.5 8.5l-4-4L4 16z"/>',
+link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+refresh:'<path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v5h-5"/>',
+gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',
+pin:'<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+list:'<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+megaphone:'<path d="M3 10v4h3l7 4V6L6 10z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/>',
+help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17v.01"/>',
+image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
+copy:'<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>',
+play:'<path d="M7 4.5v15l12-7.5z"/>',
+logout:'<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 16l-4-4 4-4M6 12h11"/>',
+mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
+note:'<path d="M5 4h14v11l-5 5H5z"/><path d="M14 20v-5h5M8.5 9h7M8.5 12.5h4"/>'
+};
+const ic=(n,cls='')=>`<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n]||''}</svg>`;
+/* ---------- estado ---------- */
+const S={team:[],machines:[],maintenances:[],faults:[],messages:[]};
+const loaded=new Set();
+const app={mode:'loading',uid:null,canWrite:null,readOnly:false,stack:[{v:'inicio'}],
+q:{},fil:{averias:'Pendientes',registroType:null,registroMine:false},cal:null,rep:{days:30},selMsg:null,closing:false,editMe:null,local:false};
+let DB=null,USER=null,ASSETS=null,DL=null,DICT=null,F={};
+const localISO=(d=new Date())=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+/* chat: mensajes no leídos (por navegador) */
+let chatSeenAt=lsGet('mecateam-chat-seen',null);if(chatSeenAt==null){chatSeenAt=Date.now();lsSet('mecateam-chat-seen',chatSeenAt)}
+function unread(){const me=myId();return S.messages.filter(m=>m.createdAt>chatSeenAt&&m.authorId!==me).length}
+function markChatSeen(){const mx=S.messages.reduce((s,m)=>Math.max(s,m.createdAt||0),0);if(mx>chatSeenAt){chatSeenAt=mx;lsSet('mecateam-chat-seen',mx)}}
+const cur=()=>app.stack[app.stack.length-1];
+const byId=(c,id)=>S[c].find(x=>x.id===id)||null;
+const member=id=>byId('team',id);
+const nm=id=>member(id)?.name||(id?'Alguien':'—');
+const hasDemo=()=>COLS.some(c=>S[c].some(x=>x.demo));
+function meM(){
+if(app.uid){const m=S.team.find(t=>t.uid===app.uid);if(m)return m}
+const lid=lsGet('mecateam-me',null);return lid?member(lid):null;
+}
+const myId=()=>meM()?.id||null;
+const openFaults=mid=>S.faults.filter(f=>f.machineId===mid&&f.status!=='Cerrada');
+function mState(m){const o=openFaults(m.id);if(o.some(f=>f.stopped))return['Parada','red'];if(o.length)return['Con avería','orange'];return['Operativa','green']}
+function dueBadge(ms){const d=daysUntil(ms);if(d===null)return'';if(d<0)return badge('Vencida '+(-d)+' d','red');if(d===0)return badge('Hoy','orange');if(d<=7)return badge('En '+d+' d','orange');return badge(fmtD(ms),'green')}
+const prioRank=p=>PRIOS.length-PRIOS.indexOf(p);
+/* ---------- almacenamiento ---------- */
+function localLoad(){const d=lsGet('mecateam-local-v1',null);if(d)COLS.forEach(c=>S[c]=Array.isArray(d[c])?d[c]:[]);COLS.forEach(c=>loaded.add(c))}
+function localSave(){lsSet('mecateam-local-v1',S)}
+function sortCol(c){
+if(c==='maintenances')S[c].sort((a,b)=>b.doneAt-a.doneAt);
+else if(c==='faults'||c==='messages')S[c].sort((a,b)=>b.createdAt-a.createdAt);
+else S[c].sort((a,b)=>String(a.name).localeCompare(String(b.name),'es'));
+}
+function handleErr(e){
+const code=e&&e.code;
+if(code==='invalid_argument'&&app.canWrite!==true){app.readOnly=true;document.body.classList.add('ro');toast('Este enlace es de solo lectura. Pide al propietario acceso de Colaborador para poder anotar.','err');render();return}
+if(code==='quota_exceeded'){toast('La base de datos está llena. Borra datos antiguos (por ejemplo los de ejemplo) desde Equipo.','err');return}
+if(code==='resource_exhausted'){toast('Demasiados cambios seguidos. Espera unos segundos y repite.','err');return}
+toast('No se ha guardado. Revisa la conexión y vuelve a intentarlo.','err');
+}
+async function put(c,id,data){
+if(app.readOnly){toast('Solo lectura: no puedes cambiar datos.','err');throw {code:'ro'}}
+if(DB){try{await DB.collection(c).doc(id).set(data)}catch(e){handleErr(e);throw e}}
+else{const i=S[c].findIndex(x=>x.id===id);const row={...data,id};if(i>=0)S[c][i]=row;else S[c].push(row);sortCol(c);localSave();schedule()}
+}
+async function patch(c,id,data){
+if(app.readOnly){toast('Solo lectura: no puedes cambiar datos.','err');throw {code:'ro'}}
+if(DB){try{await DB.collection(c).doc(id).update(data)}catch(e){handleErr(e);throw e}}
+else{const r=byId(c,id);if(r)Object.assign(r,data);sortCol(c);localSave();schedule()}
+}
+async function del(c,id){
+if(app.readOnly){toast('Solo lectura: no puedes cambiar datos.','err');throw {code:'ro'}}
+if(DB){try{await DB.collection(c).doc(id).delete()}catch(e){handleErr(e);throw e}}
+else{S[c]=S[c].filter(x=>x.id!==id);localSave();schedule()}
+}
+function strip(o){const r={...o};delete r.id;return r}
+function subscribe(){
+const qs={team:DB.collection('team'),machines:DB.collection('machines'),
+maintenances:DB.collection('maintenances').orderBy('doneAt','desc').limit(800),
+faults:DB.collection('faults').orderBy('createdAt','desc').limit(600),
+messages:DB.collection('messages').orderBy('createdAt','desc').limit(250)};
+for(const c of COLS){
+qs[c].onSnapshot(snap=>{S[c]=snap.docs.map(d=>({...d.data(),id:d.id}));sortCol(c);loaded.add(c);schedule()},
+e=>{loaded.add(c);if(e&&e.code!=='revoked')toast('No se pudieron cargar los datos ('+c+').','err');schedule()});
+}
+}
+/* ---------- arranque ---------- */
+async function boot(){
+try{const t=lsGet('mecateam-theme','system');if(t!=='system')document.documentElement.setAttribute('data-theme',t)}catch(e){}
+const hash=(location.hash||'').slice(1);
+if(/^maq-[A-Za-z0-9_.~-]+$/.test(hash)){app.stack=[{v:'maquinas'},{v:'maquina',id:hash.slice(4)}];app.fromQR=hash.slice(4)}
+else if(['chat','averias','registro','maquinas','calendario','informes','equipo'].includes(hash))app.stack=[{v:hash}];
+render();
+const C=window.claude;
+if(C&&typeof C.use==='function'){
+const safe=n=>C.use(n).catch(()=>null);
+[DB,USER,ASSETS,DL,DICT]=await Promise.all([safe('db'),safe('user'),safe('assets'),safe('downloads'),safe('dictation')]);
+if(DICT)setupDict();
+}
+if(USER){try{app.uid=await USER.id()}catch(e){};try{app.canWrite=await USER.can('data.write')}catch(e){}}
+if(app.canWrite===false){app.readOnly=true;document.body.classList.add('ro')}
+if(DB){app.mode='db';subscribe()}else{app.mode='local';app.local=true;localLoad()}
+render();
+setInterval(()=>{if(!document.hidden&&!F.dirty)schedule()},60000);
+}
+/* ---------- render ---------- */
+let rq=0;
+function schedule(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;render()})}
+const ready=(...cs)=>cs.every(c=>loaded.has(c));
+const VIEWS={};
+const TITLES={inicio:'Inicio',chat:'Chat del equipo',averias:'Averías',registro:'Mantenimientos',maquinas:'Máquinas',calendario:'Calendario',informes:'Informes',equipo:'Equipo',
+maquina:'Máquina',averia:'Avería',mant:'Mantenimiento','nueva-averia':'Nueva avería','nuevo-mant':'Registrar trabajo','form-maquina':'Máquina',etiquetas:'Etiquetas QR',
+'editar-averia':'Editar avería','editar-mant':'Editar trabajo'};
+const NAV=[['inicio','home','Inicio'],['chat','chat','Chat'],['averias','alert','Averías'],['registro','wrench','Registro'],['maquinas','chip','Máquinas']];
+const NAV2=[['calendario','cal','Calendario'],['informes','chart','Informes'],['equipo','users','Equipo']];
+function rootOf(v){return{maquina:'maquinas','form-maquina':'maquinas',etiquetas:'maquinas',averia:'averias','nueva-averia':'averias','editar-averia':'averias',mant:'registro','nuevo-mant':'registro','editar-mant':'registro'}[v]||v}
+function render(){
+const c=cur(),root=rootOf(app.stack[0].v);
+const open=S.faults.filter(f=>f.status!=='Cerrada').length;
+const m=meM();
+if(c.v==='chat'&&ready('messages'))markChatSeen();
+const un=unread();
+const cnt=v=>v==='averias'&&open?`<span class="cnt">${open}</span>`:v==='chat'&&un?`<span class="cnt" style="background:var(--blue)">${un>99?'99+':un}</span>`:'';
+// sidebar
+$('#side').innerHTML=`<div class="brand"><span class="logo">${ic('gear')}</span><div><b>MecaTeam</b><small>Mantenimiento y equipo</small></div></div>
+${NAV.map(([v,i,l])=>`<button class="nav ${root===v?'on':''}" data-a="tab" data-v="${v}">${ic(i)}<span>${l}</span>${cnt(v)}</button>`).join('')}
+<div class="sep"></div>
+${NAV2.map(([v,i,l])=>`<button class="nav ${root===v?'on':''}" data-a="tab" data-v="${v}">${ic(i)}<span>${l}</span></button>`).join('')}
+<button class="who" data-a="tab" data-v="equipo">${m?av(m.name):`<span class="av" style="background:#5C6F82">${ic('user')}</span>`}<div class="grow"><div>${esc(m?.name||'¿Quién eres?')}</div><small>${esc(m?.role||'Elige tu nombre')}</small></div></button>`;
+// top bar
+const isRoot=app.stack.length===1;
+$('#top').innerHTML=(isRoot?`<div class="brandmini"><span class="logo">${ic('gear')}</span><h1>${esc(c.v==='inicio'?'MecaTeam':TITLES[c.v])}</h1></div>`
+:`<button class="ib" data-a="back" aria-label="Volver">${ic('back')}</button><h1>${esc(viewTitle(c))}</h1>`)+
+`${isRoot&&['inicio','averias','registro','maquinas','chat'].includes(c.v)?`<button class="ib" data-a="tab" data-v="calendario" aria-label="Calendario">${ic('cal')}</button><button class="ib" data-a="tab" data-v="informes" aria-label="Informes">${ic('chart')}</button>`:''}
+<button class="ib meav" data-a="tab" data-v="equipo" aria-label="Equipo y perfil">${m?av(m.name,30):ic('users')}</button>`;
+// tabs
+$('#tabs').innerHTML=NAV.map(([v,i,l])=>`<button class="${root===v?'on':''}" data-a="tab" data-v="${v}">${ic(i)}<span>${l}</span>${cnt(v)}</button>`).join('');
+// main (con conservación del foco)
+const main=$('#main');const a=document.activeElement;
+const fid=a&&a.id&&main.contains(a)?a.id:null;let s1=null,s2=null;try{s1=a.selectionStart;s2=a.selectionEnd}catch(e){}
+let html;try{html=banners()+(VIEWS[c.v]||VIEWS.inicio)(c)}catch(err){console.error(err);html=`<div class="empty">${ic('help')}<div class="t">Algo ha fallado al mostrar esta pantalla</div><button class="btn" data-a="tab" data-v="inicio">Volver al inicio</button></div>`}
+main.classList.toggle('enter',!!app.anim);app.anim=false;
+main.innerHTML=html;main.classList.toggle('chatv',c.v==='chat');
+if(fid){const n=document.getElementById(fid);if(n){n.focus({preventScroll:true});try{if(s1!=null)n.setSelectionRange(s1,s2)}catch(e){}}}
+if(c.v==='chat')afterChat();
+maybeOnboard();
+hydrateQR();
+}
+/* ---------- dictado por voz ---------- */
+let dictKey=null,dictEl=null,dictState='idle';
+function setupDict(){
+try{
+DICT.onPartial(({text})=>{const el=dictEl&&document.getElementById(dictEl);if(el&&dictKey){const b=F[dictKey]||'';el.value=b+(b&&!/\s$/.test(b)?' ':'')+text}});
+DICT.onFinal(({text})=>{if(!dictKey||!text)return;const b=F[dictKey]||'';F[dictKey]=b+(b&&!/\s$/.test(b)?' ':'')+text.trim();F.dirty=true;
+const el=dictEl&&document.getElementById(dictEl);if(el){el.value=F[dictKey];el.dispatchEvent(new Event('input',{bubbles:true}))}});
+DICT.onState(({state,reason})=>{dictState=state;if(state==='idle'){dictKey=null;dictEl=null}paintMic()});
+}catch(e){DICT=null}
+}
+function paintMic(){document.querySelectorAll('.mic').forEach(b=>b.classList.toggle('on',dictState==='listening'&&b.dataset.k===dictKey))}
+const mic=(k,elId)=>DICT?`<button type="button" class="mic ${dictState==='listening'&&dictKey===k?'on':''}" data-a="dict" data-k="${k}" data-el="${elId}" aria-label="Dictar por voz" title="Dictar por voz">${ic('mic')}</button>`:'';
+const lblMic=(forId,label,k)=>`<div class="lblrow"><label class="lbl" for="${forId}">${label}</label>${mic(k,forId)}</div>`;
+function viewTitle(c){
+if(c.v==='maquina'){const m=byId('machines',c.id);return m?m.code+' · '+m.name:'Máquina'}
+if(c.v==='form-maquina')return c.id?'Editar máquina':'Nueva máquina';
+return TITLES[c.v]||'MecaTeam';
+}
+function banners(){
+let h='';
+if(app.mode==='local')h+=`<div class="banner soft">${ic('help')}<span>Modo sin conexión: los datos se guardan solo en este navegador. Ábrelo desde el enlace de Claude para compartirlo con el equipo.</span></div>`;
+if(app.readOnly)h+=`<div class="banner soft">${ic('help')}<span>Tienes acceso de solo lectura. Para anotar trabajos y averías, pide al propietario que te dé acceso de Colaborador.</span></div>`;
+if(hasDemo()&&!app.readOnly&&cur().v==='inicio')h+=`<div class="banner">${ic('box')}<span><b>Hay datos de ejemplo</b> (máquinas, trabajos y averías ficticios). Bórralos cuando empecéis a usarla de verdad.</span><button class="btn sm" data-a="askDemo">Borrar ejemplos</button></div>`;
+return h;
+}
+const skel=()=>'<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+const empty=(i,t,s)=>`<div class="empty">${ic(i)}<div class="t">${esc(t)}</div>${s?`<div>${esc(s)}</div>`:''}</div>`;
+const fab=(a,l,extra='')=>`<button class="fab" data-w data-a="${a}" ${extra}>${ic('plus')}${esc(l)}</button>`;
+/* ---------- tarjetas ---------- */
+function faultCard(f){
+const pc=`var(--${PR_C[f.priority]||'muted'})`;
+return `<div class="card tap fault" style="--pc:${pc}" data-a="go" data-v="averia" data-id="${esc(f.id)}">
+<div class="top-row"><div class="bs">${badge(f.status,ST_C[f.status]||'muted')}${badge(f.priority,PR_C[f.priority]||'muted')}${f.stopped&&f.status!=='Cerrada'?'<span class="badge haz"><b>PARADA</b></span>':''}</div><span class="sub">${fmtRel(f.createdAt)}</span></div>
+<div class="t">${esc(f.title)}</div>
+${f.machineId?`<div class="sub">${esc(machineLabel(f.machineId))}</div>`:''}
+<div class="meta"><span>${ic('megaphone')}${esc(nm(f.createdById))}</span><span>${ic(f.assignedToId?'wrench':'help')}${esc(f.assignedToId?nm(f.assignedToId):'Sin asignar')}</span>${(f.photos||[]).length?`<span>${ic('camera')}${f.photos.length}</span>`:''}${f.status!=='Cerrada'?`<span>${ic('clock')}abierta ${esc(dur(Date.now()-f.createdAt))}</span>`:''}</div>
+</div>`;
+}
+function machineLabel(id){const m=byId('machines',id);return m?m.code+' · '+m.name:'Máquina borrada'}
+function maintCard(x,showM=true){
+return `<div class="card tap" data-a="go" data-v="mant" data-id="${esc(x.id)}">
+<div class="top-row row" style="justify-content:space-between;margin-bottom:6px">${badge(x.type,MT_C[x.type]||'muted')}<span class="sub">${fmtRel(x.doneAt)}</span></div>
+<div class="t">${esc(x.title)}</div>
+${showM?`<div class="sub">${esc(machineLabel(x.machineId))}</div>`:''}
+<div class="meta"><span>${ic('user')}${esc(nm(x.doneById))}</span>${x.durationMin?`<span>${ic('clock')}${x.durationMin} min</span>`:''}${x.parts?`<span>${ic('box')}recambios</span>`:''}${(x.photos||[]).length?`<span>${ic('camera')}${x.photos.length}</span>`:''}</div>
+</div>`;
+}
+function machineCard(m){
+const [st,sc]=mState(m);const d=daysUntil(m.nextDueAt);
+return `<div class="card tap mcard" data-a="go" data-v="maquina" data-id="${esc(m.id)}">
+<span class="plate">${esc(m.code||'—')}</span>
+<div class="grow"><div class="t">${esc(m.name)}</div>
+<div class="sub">${m.location?esc(m.location)+' · ':''}${m.lastMaintenanceAt?'Últ. mant. '+fmtRel(m.lastMaintenanceAt):'Sin mantenimientos'}</div>
+<div class="row" style="gap:6px;margin-top:6px">${st!=='Operativa'?badge(st,sc):''}${d!==null&&d<=7?dueBadge(m.nextDueAt):''}</div></div>
+${ic('chev','chev')}
+</div>`;
+}
+/* ---------- INICIO ---------- */
+VIEWS.inicio=()=>{
+if(!ready('machines','faults','maintenances','team'))return skel();
+const m=meM(),now=Date.now();
+const open=S.faults.filter(f=>f.status!=='Cerrada');
+const urg=open.filter(f=>f.priority==='Urgente').length;
+const stopped=S.machines.filter(x=>openFaults(x.id).some(f=>f.stopped));
+const overdue=S.machines.filter(x=>{const d=daysUntil(x.nextDueAt);return d!==null&&d<0});
+const soon=S.machines.filter(x=>{const d=daysUntil(x.nextDueAt);return d!==null&&d>=0&&d<=7});
+const mine=open.filter(f=>f.assignedToId&&f.assignedToId===myId()).sort((a,b)=>prioRank(a.priority)-prioRank(b.priority));
+const monthStart=new Date(new Date().getFullYear(),new Date().getMonth(),1).getTime();
+const mm=S.maintenances.filter(x=>x.doneAt>=monthStart);
+const mins=mm.reduce((s,x)=>s+(x.durationMin||0),0);
+const dueList=S.machines.filter(x=>x.nextDueAt).sort((a,b)=>a.nextDueAt-b.nextDueAt).slice(0,6);
+const feed=[...S.maintenances.slice(0,12).map(x=>({t:x.doneAt,k:'m',x})),...S.faults.slice(0,12).map(x=>({t:x.createdAt,k:'f',x})),
+...S.faults.filter(f=>f.closedAt).map(x=>({t:x.closedAt,k:'c',x}))].filter(e=>e.t<=now+6e4).sort((a,b)=>b.t-a.t).slice(0,8);
+const tile=(n,l,s,c,act,v)=>`<button class="tile ${n>0&&c!=='ink'?'alert':''}" style="--c:var(--${n>0?c:'ink'})" data-a="${act}" data-v="${v}"><span class="n num">${n}</span><span class="l">${l}</span><span class="s">${s}</span></button>`;
+return `<div class="hello"><div><div class="d">${esc(longDate(now))}</div><h2>${m?'Hola, '+esc(m.name.split(' ')[0]):'Panel del turno'}</h2></div></div>
+<div class="tiles">
+${tile(open.length,'Averías abiertas',urg?plural(urg,'urgente','urgentes'):'ninguna urgente','red','tab','averias')}
+${tile(stopped.length,'Máquinas paradas',stopped.length?stopped.map(x=>x.code).join(', '):'todo en marcha','red','tab','maquinas')}
+${tile(overdue.length,'Revisiones vencidas',overdue.length?overdue.map(x=>x.code).join(', '):'al día','orange','tab','calendario')}
+${tile(soon.length,'Revisiones esta semana',`${mm.length} trabajos este mes · ${hrs(mins)} h`,'ink','tab','calendario')}
+</div>
+<div class="qa" data-w><button class="btn dan" data-a="newFault">${ic('alert')}Reportar avería</button><button class="btn pri" data-a="newMant">${ic('wrench')}Registrar trabajo</button></div>
+<form class="goto" data-a="gotoCode"><input class="inp" id="gotoCode" placeholder="Código de máquina, p. ej. PR-03" autocomplete="off" value="${esc(app.q.goto||'')}" data-q="goto"><button class="btn" type="submit">${ic('search')}</button></form>
+<div class="cols">
+<div>
+${mine.length?`<div class="sec"><h2>Asignadas a ti</h2></div><div class="stack">${mine.map(faultCard).join('')}</div>`:''}
+<div class="sec"><h2>Próximas revisiones</h2><button class="lnk" data-a="tab" data-v="calendario">Calendario</button></div>
+<div class="card">${dueList.length?dueList.map(x=>{const d=daysUntil(x.nextDueAt);const c=d<0?'red':d<=7?'orange':'green';
+return `<div class="due" style="--c:var(--${c})" data-a="go" data-v="maquina" data-id="${esc(x.id)}"><span class="plate">${esc(x.code)}</span><div class="grow"><div class="t" style="font-size:15px">${esc(x.name)}</div><div class="sub">${fmtD(x.nextDueAt)}</div></div><span class="dd num">${d<0?-d:d}<small>${d<0?'días tarde':d===0?'hoy':'días'}</small></span></div>`}).join('')
+:empty('cal','Sin revisiones programadas','Al registrar un preventivo elige cuándo toca la próxima.')}</div>
+</div>
+<div>
+<div class="sec"><h2>Actividad reciente</h2><button class="lnk" data-a="tab" data-v="registro">Registro</button></div>
+<div class="card">${feed.length?feed.map(e=>{
+if(e.k==='m')return `<div class="feed" style="--c:var(--${MT_C[e.x.type]||'muted'})" data-a="go" data-v="mant" data-id="${esc(e.x.id)}"><span class="dot">${ic('wrench')}</span><div class="grow"><div><b>${esc(nm(e.x.doneById))}</b> · ${esc(e.x.title)}</div><div class="sub">${esc(e.x.type)} · ${esc(machineLabel(e.x.machineId))} · ${fmtRel(e.t)}</div></div></div>`;
+if(e.k==='f')return `<div class="feed" style="--c:var(--${PR_C[e.x.priority]})" data-a="go" data-v="averia" data-id="${esc(e.x.id)}"><span class="dot">${ic('alert')}</span><div class="grow"><div><b>${esc(nm(e.x.createdById))}</b> reporta: ${esc(e.x.title)}</div><div class="sub">${esc(e.x.priority)} · ${e.x.machineId?esc(machineLabel(e.x.machineId))+' · ':''}${fmtRel(e.t)}</div></div></div>`;
+return `<div class="feed" style="--c:var(--green)" data-a="go" data-v="averia" data-id="${esc(e.x.id)}"><span class="dot">${ic('check')}</span><div class="grow"><div><b>${esc(nm(e.x.closedById))}</b> cierra: ${esc(e.x.title)}</div><div class="sub">${fmtRel(e.t)} · resuelta en ${esc(dur(e.x.closedAt-e.x.createdAt))}</div></div></div>`;
+}).join(''):empty('list','Aún no hay actividad','Registra el primer trabajo o reporta una avería.')}</div>
+</div>
+</div>`;
+};
+/* ---------- AVERÍAS ---------- */
+VIEWS.averias=()=>{
+if(!ready('faults'))return skel();
+const fv=app.fil.averias,q=(app.q.av||'').trim().toLowerCase(),me=myId();
+const counts={Pendientes:0,Abierta:0,'En curso':0,Cerrada:0,'Mías':0};
+S.faults.forEach(f=>{if(f.status!=='Cerrada')counts.Pendientes++;counts[f.status]=(counts[f.status]||0)+1;if(f.assignedToId===me&&f.status!=='Cerrada')counts['Mías']++});
+let list=S.faults.filter(f=>fv==='Pendientes'?f.status!=='Cerrada':fv==='Mías'?(f.assignedToId===me&&f.status!=='Cerrada'):f.status===fv);
+if(q)list=list.filter(f=>`${f.title} ${f.description} ${machineLabel(f.machineId)} ${nm(f.createdById)} ${nm(f.assignedToId)}`.toLowerCase().includes(q));
+if(fv!=='Cerrada')list.sort((a,b)=>(b.stopped?1:0)-(a.stopped?1:0)||prioRank(a.priority)-prioRank(b.priority)||b.createdAt-a.createdAt);
+return `<div class="stack" style="gap:12px;margin-bottom:12px">
+<div class="search">${ic('search')}<input class="inp" id="qav" data-q="av" placeholder="Buscar avería, máquina o persona" value="${esc(app.q.av||'')}"></div>
+<div class="chips scroll">${['Pendientes','Abierta','En curso','Cerrada','Mías'].map(k=>`<button class="chip ${fv===k?'on':''}" style="--c:var(--${ST_C[k]||(k==='Mías'?'blue':'ink')})" data-a="filAv" data-v="${k}">${k} <span class="num">${counts[k]||0}</span></button>`).join('')}</div></div>
+<div class="stack">${list.length?list.map(faultCard).join(''):empty('check',fv==='Cerrada'?'Nada cerrado todavía':'Todo en orden','No hay averías en esta vista.')}</div>
+${fab('newFault','Avería')}`;
+};
+VIEWS.averia=c=>{
+if(!ready('faults','team','machines'))return skel();
+const f=byId('faults',c.id);if(!f)return empty('help','Avería no encontrada','Puede que se haya borrado.');
+const closed=f.status==='Cerrada',me=myId(),pc=`var(--${PR_C[f.priority]})`;
+const log=(f.log||[]).slice().sort((a,b)=>a.t-b.t);
+return `<div class="card fault" style="--pc:${pc}">
+<div class="bs row" style="gap:6px">${badge(f.status,ST_C[f.status])}${badge('Prioridad '+f.priority,PR_C[f.priority])}${f.stopped&&!closed?'<span class="badge haz"><b>MÁQUINA PARADA</b></span>':''}</div>
+<h2 style="font:700 24px/1.15 var(--f-disp);margin-top:10px">${esc(f.title)}</h2>
+${f.machineId?`<button class="lk" data-a="go" data-v="maquina" data-id="${esc(f.machineId)}">${esc(machineLabel(f.machineId))} ›</button>`:''}
+<div style="margin-top:10px">
+<div class="info">${ic('megaphone')}<span class="k">Reportada</span><span class="v">${esc(nm(f.createdById))} · ${fmtDT(f.createdAt)}</span></div>
+<div class="info">${ic('wrench')}<span class="k">Asignada a</span><span class="v">${esc(f.assignedToId?nm(f.assignedToId):'Sin asignar')}</span></div>
+<div class="info">${ic('clock')}<span class="k">${closed?'Resuelta en':'Abierta desde hace'}</span><span class="v">${esc(dur((closed?f.closedAt:Date.now())-f.createdAt))}</span></div>
+${closed?`<div class="info">${ic('check')}<span class="k">Cerrada</span><span class="v">${esc(nm(f.closedById))} · ${fmtDT(f.closedAt)}</span></div>`:''}
+</div>
+${f.description?`<p class="body" style="margin:10px 0 0">${esc(f.description)}</p>`:''}
+<div class="hdr-actions" data-w><button class="btn sm" data-a="go" data-v="editar-averia" data-id="${esc(f.id)}">${ic('edit')}Editar</button></div>
+</div>
+${photosBlock(f.photos)}
+${closed?`<div class="sec"><h2>Solución</h2></div><div class="card body">${esc(f.resolution||'—')}</div>
+${f.maintId?`<button class="btn full" style="margin-top:10px" data-a="go" data-v="mant" data-id="${esc(f.maintId)}">${ic('wrench')}Ver trabajo registrado</button>`:''}
+<div data-w style="margin-top:10px"><button class="btn full" data-a="reopen">${ic('refresh')}Reabrir avería</button></div>`
+:`<div data-w>
+${f.assignedToId!==me&&me?`<button class="btn pri full" style="margin-top:12px" data-a="takeFault">${ic('user')}Me la quedo</button>`:''}
+<div class="sec"><h2>Gestionar</h2></div>
+<div class="card stack" style="gap:14px">
+<div><div class="lbl" style="margin-bottom:8px">Asignar a</div><div class="chips">${S.team.map(t=>`<button class="chip ${f.assignedToId===t.id?'on':''}" style="--c:var(--blue)" data-a="assign" data-id="${esc(t.id)}">${esc(t.name)}${t.id===me?' (yo)':''}</button>`).join('')||'<span class="sub">Añade personas en Equipo.</span>'}</div></div>
+<div><div class="lbl" style="margin-bottom:8px">Prioridad</div><div class="chips">${PRIOS.map(p=>`<button class="chip ${f.priority===p?'on':''}" style="--c:var(--${PR_C[p]})" data-a="prio" data-v="${p}">${p}</button>`).join('')}</div></div>
+${f.machineId?`<button class="toggle red ${f.stopped?'on':''}" data-a="toggleStop"><span class="sw"></span><span class="grow"><b>Máquina parada</b><div class="sub">${f.stopped?'Cuenta como tiempo de parada en Informes.':'Márcalo si la máquina no puede producir.'}</div></span></button>`:''}
+</div>
+<div class="sec"><h2>Resolver</h2></div>
+${f.machineId?`<button class="btn ok full" data-a="repairClose">${ic('wrench')}Registrar reparación y cerrar</button>`:''}
+${app.closing?`<div class="card" style="margin-top:10px"><div class="fld">${lblMic('resol','¿Cómo se ha resuelto?','resol')}<textarea class="inp" id="resol" data-f="resol" placeholder="Rearme del térmico, sensor limpiado…">${esc(F.resol||'')}</textarea></div>
+<div class="btns"><button class="btn" data-a="closeCancel">Cancelar</button><button class="btn ok" data-a="closeFault">${ic('check')}Cerrar avería</button></div></div>`
+:`<button class="btn ghost full" style="margin-top:6px" data-a="closeOpen">Cerrar con una nota, sin registrar trabajo</button>`}
+</div>`}
+<div class="sec"><h2>Seguimiento</h2></div><div class="card">${log.length?`<div class="log">${log.map(l=>l.note?`<div class="note"><small>${esc(nm(l.by))} · ${fmtDT(l.t)}</small><span class="nb">${esc(l.x)}</span></div>`:`<div>${esc(l.x)} <small>· ${esc(nm(l.by))} · ${fmtDT(l.t)}</small></div>`).join('')}</div>`:'<div class="sub">Sin movimientos todavía.</div>'}
+<form class="notebox" data-w data-a="addNote"><textarea class="inp grow" id="noteIn" data-f="note" rows="1" placeholder="Añadir nota: qué has probado, qué falta, pedido de recambio…">${esc(F.note||'')}</textarea>${mic('note','noteIn')}<button class="btn pri" type="submit" aria-label="Añadir nota" ${F.busyNote?'disabled':''}>${ic('send')}</button></form></div>`;
+};
+function photosBlock(ids){
+ids=ids||[];if(!ids.length)return'';
+return `<div class="sec"><h2>Fotos (${ids.length})</h2></div><div class="photos">${ids.map(id=>`<img src="${esc(blobUrl(id))}" alt="Foto adjunta" loading="lazy" data-a="lightbox" data-src="${esc(blobUrl(id))}">`).join('')}</div>`;
+}
+/* ---------- REGISTRO ---------- */
+VIEWS.registro=()=>{
+if(!ready('maintenances'))return skel();
+const q=(app.q.reg||'').trim().toLowerCase(),t=app.fil.registroType,mine=app.fil.registroMine,me=myId();
+const list=S.maintenances.filter(x=>(!t||x.type===t)&&(!mine||x.doneById===me)&&(!q||`${x.title} ${machineLabel(x.machineId)} ${nm(x.doneById)} ${x.description} ${x.parts}`.toLowerCase().includes(q)));
+const mins=list.reduce((s,x)=>s+(x.durationMin||0),0);
+return `<div class="stack" style="gap:12px;margin-bottom:12px">
+<div class="search">${ic('search')}<input class="inp" id="qreg" data-q="reg" placeholder="Buscar por máquina, técnico, recambio…" value="${esc(app.q.reg||'')}"></div>
+<div class="chips scroll"><button class="chip ${mine?'on':''}" style="--c:var(--blue)" data-a="filMine">Míos</button><button class="chip ${!t?'on':''}" data-a="filType" data-v="">Todos</button>
+${MAINT_TYPES.map(k=>`<button class="chip ${t===k?'on':''}" style="--c:var(--${MT_C[k]})" data-a="filType" data-v="${k}">${k}</button>`).join('')}</div>
+<div class="sub">${plural(list.length,'trabajo','trabajos')} · ${hrs(mins)} h registradas</div></div>
+<div class="stack">${list.length?list.map(x=>maintCard(x)).join(''):empty('wrench','Sin mantenimientos','Registra el primero con el botón de abajo.')}</div>
+${fab('newMant','Registrar')}`;
+};
+VIEWS.mant=c=>{
+if(!ready('maintenances','team','machines'))return skel();
+const x=byId('maintenances',c.id);if(!x)return empty('help','Registro no encontrado');
+return `<div class="card">${badge(x.type,MT_C[x.type])}
+<h2 style="font:700 24px/1.15 var(--f-disp);margin-top:10px">${esc(x.title)}</h2>
+<button class="lk" data-a="go" data-v="maquina" data-id="${esc(x.machineId)}">${esc(machineLabel(x.machineId))} ›</button>
+<div class="row nw" style="margin-top:14px">${av(nm(x.doneById))}<div><div class="t" style="font-size:15px">${esc(nm(x.doneById))}</div><div class="sub">${fmtDT(x.doneAt)}</div></div></div>
+<div style="margin-top:10px">
+${x.durationMin?`<div class="info">${ic('clock')}<span class="k">Duración</span><span class="v">${x.durationMin} min</span></div>`:''}
+<div class="info">${ic('cal')}<span class="k">Próx. revisión</span><span class="v">${x.nextDueAt?fmtD(x.nextDueAt):'—'}</span></div>
+${x.parts?`<div class="info">${ic('box')}<span class="k">Recambios</span><span class="v">${esc(x.parts)}</span></div>`:''}
+${x.faultId?`<div class="info">${ic('alert')}<span class="k">Avería</span><span class="v"><button class="lk" data-a="go" data-v="averia" data-id="${esc(x.faultId)}">${esc(byId('faults',x.faultId)?.title||'Ver avería')} ›</button></span></div>`:''}
+</div></div>
+${x.description?`<div class="sec"><h2>Detalles</h2></div><div class="card body">${esc(x.description)}</div>`:''}
+${photosBlock(x.photos)}
+<div class="btns" style="margin-top:18px"><button class="btn" data-w data-a="go" data-v="editar-mant" data-id="${esc(x.id)}">${ic('edit')}Editar</button><button class="btn" data-a="dlMantLabel">${ic('download')}Etiqueta de mantenimiento</button><button class="btn" data-w data-a="askDelMant" style="color:var(--red)">${ic('trash')}Borrar registro</button></div>
+<p class="sub" style="text-align:center">La etiqueta se descarga como página lista para imprimir: tipo, fecha, técnico, próxima revisión y QR.</p>`;
+};
+/* ---------- MÁQUINAS ---------- */
+VIEWS.maquinas=()=>{
+if(!ready('machines','faults'))return skel();
+const q=(app.q.maq||'').trim().toLowerCase();
+const list=S.machines.filter(m=>!q||`${m.name} ${m.code} ${m.location} ${m.description}`.toLowerCase().includes(q))
+.sort((a,b)=>{const sa=mState(a)[0]==='Parada'?0:1,sb=mState(b)[0]==='Parada'?0:1;return sa-sb||(daysUntil(a.nextDueAt)??9999)-(daysUntil(b.nextDueAt)??9999)||String(a.code).localeCompare(String(b.code))});
+return `<div class="stack" style="gap:12px;margin-bottom:12px">
+<div class="search">${ic('search')}<input class="inp" id="qmaq" data-q="maq" placeholder="Buscar máquina, código o zona" value="${esc(app.q.maq||'')}"></div>
+<div class="btns"><button class="btn" data-a="go" data-v="etiquetas" ${list.length?'':'disabled'}>${ic('qr')}Etiquetas QR</button><button class="btn" data-a="tab" data-v="calendario">${ic('cal')}Calendario de revisiones</button></div></div>
+<div class="stack">${list.length?list.map(machineCard).join(''):empty('chip','Sin máquinas','Da de alta las máquinas de la planta para generar sus etiquetas QR.')}</div>
+${fab('newMachine','Máquina')}`;
+};
+VIEWS.maquina=c=>{
+if(!ready('machines','faults','maintenances'))return skel();
+const m=byId('machines',c.id);if(!m)return empty('help','Máquina no encontrada','Puede que se haya borrado o que el QR no sea de este equipo.');
+const of=openFaults(m.id),hist=S.maintenances.filter(x=>x.machineId===m.id),[st,sc]=mState(m);
+const closedF=S.faults.filter(f=>f.machineId===m.id&&f.status==='Cerrada');
+const down=S.faults.filter(f=>f.machineId===m.id&&f.stopped).reduce((s,f)=>s+((f.closedAt||Date.now())-f.createdAt),0);
+return `<div class="card"><div class="dhead"><div class="grow">
+<span class="plate lg">${esc(m.code||'—')}</span>
+<h2>${esc(m.name)}</h2>${m.location?`<div class="sub row" style="gap:4px">${ic('pin')}${esc(m.location)}</div>`:''}
+<div class="row" style="gap:6px;margin-top:10px">${badge(st,sc)}${m.nextDueAt?dueBadge(m.nextDueAt):''}${of.length?badge(plural(of.length,'avería abierta','averías abiertas'),'red'):''}</div></div>
+<div class="qr" data-qr="${esc(m.id)}"></div></div>
+<div style="margin-top:12px">
+<div class="info">${ic('wrench')}<span class="k">Último mant.</span><span class="v">${m.lastMaintenanceAt?esc(fmtRel(m.lastMaintenanceAt)+' · '+nm(m.lastMaintenanceById)):'—'}</span></div>
+<div class="info">${ic('cal')}<span class="k">Próx. revisión</span><span class="v">${m.nextDueAt?fmtD(m.nextDueAt):'Sin fecha'}${m.intervalDays?` · cada ${m.intervalDays} días`:''}</span></div>
+<div class="info">${ic('list')}<span class="k">Historial</span><span class="v">${plural(hist.length,'trabajo','trabajos')} · ${plural(closedF.length,'avería resuelta','averías resueltas')}</span></div>
+<div class="info">${ic('stop')}<span class="k">Tiempo parada</span><span class="v">${down?esc(dur(down)):'Sin paradas registradas'}</span></div>
+</div>
+${m.description?`<p class="body" style="margin:10px 0 0">${esc(m.description)}</p>`:''}
+<div class="btns" style="margin-top:14px"><button class="btn sm" data-a="dlLabels" data-id="${esc(m.id)}">${ic('download')}Etiqueta QR</button><button class="btn sm" data-a="copyLink" data-id="${esc(m.id)}">${ic('link')}Copiar enlace</button><button class="btn sm" data-w data-a="go" data-v="form-maquina" data-id="${esc(m.id)}">${ic('edit')}Editar</button></div>
+</div>
+<div class="btns" style="margin-top:12px" data-w><button class="btn pri" data-a="newMant" data-mid="${esc(m.id)}">${ic('wrench')}Mantenimiento</button><button class="btn dan" data-a="newFault" data-mid="${esc(m.id)}">${ic('alert')}Avería</button></div>
+${of.length?`<div class="sec"><h2>Averías abiertas</h2></div><div class="stack">${of.map(faultCard).join('')}</div>`:''}
+<div class="sec"><h2>Historial de mantenimiento</h2></div>
+<div class="stack">${hist.length?hist.map(x=>maintCard(x,false)).join(''):empty('clock','Sin registros','Cuando alguien registre un trabajo aparecerá aquí.')}</div>`;
+};
+VIEWS['form-maquina']=c=>{
+if(!ready('machines'))return skel();
+if(F._for!=='maq'+(c.id||'')){const m=c.id?byId('machines',c.id):null;F={_for:'maq'+(c.id||''),name:m?.name||'',code:m?.code||'',location:m?.location||'',description:m?.description||'',interval:m?.intervalDays||0}}
+return `<form class="card" data-a="saveMachine">
+<div class="fld"><label for="mname">Nombre</label><input class="inp" id="mname" data-f="name" value="${esc(F.name)}" placeholder="Prensa hidráulica 250T" required></div>
+<div class="fld"><label for="mcode">Código</label><input class="inp" id="mcode" data-f="code" value="${esc(F.code)}" placeholder="PR-03" style="font-family:var(--f-mono);text-transform:uppercase" required><span class="hint">Se imprime en grande en la etiqueta QR.</span></div>
+<div class="fld"><label for="mloc">Ubicación</label><input class="inp" id="mloc" data-f="location" value="${esc(F.location)}" placeholder="Nave 2 · Línea B"></div>
+<div class="fld"><label for="mdesc">Notas técnicas</label><textarea class="inp" id="mdesc" data-f="description" placeholder="Fabricante, modelo, nº de serie, PLC, aceite que usa…">${esc(F.description)}</textarea></div>
+<div class="fld"><span class="lbl">Preventivo cada</span><div class="chips">${NEXT.map(([l,d])=>`<button type="button" class="chip ${+F.interval===d?'on':''}" style="--c:var(--green)" data-a="setF" data-k="interval" data-v="${d}">${l==='Sin fecha'?'Sin plan':l}</button>`).join('')}</div><span class="hint">Se propone como próxima revisión al registrar un preventivo.</span></div>
+<div class="btns"><button type="button" class="btn" data-a="back">Cancelar</button><button type="submit" class="btn pri">${ic('check')}${c.id?'Guardar':'Crear máquina'}</button></div>
+${c.id?`<button type="button" class="btn ghost full" style="color:var(--red);margin-top:10px" data-a="askDelMachine">${ic('trash')}Borrar máquina</button>`:''}
+</form>`;
+};
+VIEWS.etiquetas=()=>{
+if(!ready('machines'))return skel();
+if(!F._for||F._for!=='lab'){F={_for:'lab',sel:S.machines.map(m=>m.id)}}
+return `<p class="sub" style="margin-top:0">Elige las máquinas y descarga una hoja lista para imprimir en pegatinas. Al escanear el QR con el móvil se abre la ficha de la máquina en MecaTeam.</p>
+<div class="row" style="margin-bottom:10px"><button class="btn sm" data-a="labAll">Todas</button><button class="btn sm" data-a="labNone">Ninguna</button><span class="sub grow" style="text-align:right">${F.sel.length} seleccionadas</span></div>
+<div class="stack">${S.machines.map(m=>`<button class="pick" data-a="labTog" data-id="${esc(m.id)}" style="margin:0"><span class="toggle ${F.sel.includes(m.id)?'on':''}" style="border:0;padding:0;width:auto;background:none"><span class="sw"></span></span><span class="plate">${esc(m.code)}</span><span class="grow">${esc(m.name)}</span></button>`).join('')}</div>
+<button class="btn pri full" style="margin-top:16px" data-a="dlLabels" ${F.sel.length?'':'disabled'}>${ic('download')}Descargar hoja de etiquetas</button>`;
+};
+/* ---------- FORMULARIOS ---------- */
+function machineSelect(id,val,optional){
+const ms=[...S.machines].sort((a,b)=>String(a.code).localeCompare(String(b.code)));
+return `<select class="inp" id="${id}" data-f="machineId">${optional?`<option value="">Sin máquina</option>`:`<option value="" disabled ${val?'':'selected'}>Elige la máquina…</option>`}
+${ms.map(m=>`<option value="${esc(m.id)}" ${val===m.id?'selected':''}>${esc(m.code+' · '+m.name)}</option>`).join('')}</select>`;
+}
+function photoPicker(){
+if(!ASSETS)return '';
+const ps=F.photos||[];
+return `<div class="fld"><span class="lbl">Fotos</span><div class="pp">${ps.map((p,i)=>`<div class="th"><img src="${p.url}" alt=""><button type="button" data-a="rmPhoto" data-i="${i}" aria-label="Quitar foto">${ic('x')}</button></div>`).join('')}
+<label class="add" for="phIn">${ic('camera')}</label><input type="file" id="phIn" accept="image/*" multiple hidden data-a-change="addPhotos"></div></div>`;
+}
+VIEWS['nueva-averia']=c=>{
+if(!ready('machines'))return skel();
+if(F._for!=='fa'){F={_for:'fa',machineId:c.mid||'',title:'',description:'',priority:'Media',stopped:false,notify:true,photos:[]}}
+return `<form class="card" data-a="saveFault">
+<div class="fld"><label for="fm">Máquina (opcional)</label>${machineSelect('fm',F.machineId,true)}</div>
+<div class="fld"><label for="ft">¿Qué pasa?</label><input class="inp" id="ft" data-f="title" value="${esc(F.title)}" placeholder="Fuga de aceite en el cilindro" required></div>
+<div class="fld">${lblMic('fd','Descripción','description')}<textarea class="inp" id="fd" data-f="description" placeholder="Síntomas, alarmas del panel, cuándo empezó…">${esc(F.description)}</textarea></div>
+<div class="fld"><span class="lbl">Prioridad</span><div class="chips">${PRIOS.map(p=>`<button type="button" class="chip ${F.priority===p?'on':''}" style="--c:var(--${PR_C[p]})" data-a="setF" data-k="priority" data-v="${p}">${p}</button>`).join('')}</div></div>
+<div class="fld"><button type="button" class="toggle red ${F.stopped&&F.machineId?'on':''}" data-a="togF" data-k="stopped" ${F.machineId?'':'disabled'}><span class="sw"></span><span class="grow"><b>La máquina está parada</b><div class="sub">${F.machineId?'Se cuenta el tiempo de parada hasta que se cierre.':'Elige primero la máquina para poder marcarla parada.'}</div></span></button></div>
+${photoPicker()}
+<div class="fld"><button type="button" class="toggle ${F.notify?'on':''}" data-a="togF" data-k="notify"><span class="sw"></span><span class="grow"><b>Avisar en el chat</b><div class="sub">Publica un aviso para todo el equipo.</div></span></button></div>
+<button type="submit" class="btn dan full" ${F.busy?'disabled':''}>${ic('alert')}${F.busy?'Guardando…':'Reportar avería'}</button>
+</form>`;
+};
+VIEWS['nuevo-mant']=c=>{
+if(!ready('machines','team'))return skel();
+const fault=c.fid?byId('faults',c.fid):null;
+if(F._for!=='mt'){
+const m=c.mid?byId('machines',c.mid):null;const today=new Date();
+F={_for:'mt',machineId:c.mid||'',type:fault?'Correctivo':'Preventivo',title:fault?'Reparación: '+fault.title:'',description:'',parts:'',duration:'',
+date:localISO(today),by:myId()||'',next:fault?0:(m?.intervalDays||0),notify:!!fault,photos:[]};
+}
+const team=S.team;
+return `${fault?`<div class="banner soft">${ic('alert')}<span>Al guardar se cerrará la avería «${esc(fault.title)}».</span></div>`:''}
+<form class="card" data-a="saveMant">
+<div class="fld"><label for="mm">Máquina</label>${machineSelect('mm',F.machineId,false)}</div>
+<div class="fld"><span class="lbl">Tipo</span><div class="chips">${MAINT_TYPES.map(t=>`<button type="button" class="chip ${F.type===t?'on':''}" style="--c:var(--${MT_C[t]})" data-a="setF" data-k="type" data-v="${t}">${t}</button>`).join('')}</div></div>
+<div class="fld"><label for="mt">Trabajo realizado</label><input class="inp" id="mt" data-f="title" value="${esc(F.title)}" placeholder="Cambio de rodamientos del motor principal" required></div>
+<div class="fld">${lblMic('md','Detalles','description')}<textarea class="inp" id="md" data-f="description" placeholder="Qué se ha hecho, mediciones, observaciones…">${esc(F.description)}</textarea></div>
+<div class="fld"><label for="mp">Recambios usados</label><input class="inp" id="mp" data-f="parts" value="${esc(F.parts)}" placeholder="2× rodamiento 6205-2RS, grasa LGMT2"></div>
+<div class="grid2" style="gap:0 12px">
+<div class="fld"><label for="mdu">Duración (minutos)</label><input class="inp num" id="mdu" data-f="duration" inputmode="numeric" value="${esc(F.duration)}" placeholder="45">
+<div class="chips" style="margin-top:4px">${[15,30,60,90,120].map(v=>`<button type="button" class="chip ${String(F.duration)===String(v)?'on':''}" data-a="setF" data-k="duration" data-v="${v}">${v<60?v+' min':String(v/60).replace('.',',')+' h'}</button>`).join('')}</div></div>
+<div class="fld"><label for="mda">Día del trabajo</label><input class="inp" type="date" id="mda" data-f="date" value="${esc(F.date)}" max="${localISO()}"></div>
+</div>
+<div class="fld"><span class="lbl">Realizado por</span><div class="chips">${(team.length?team:[]).map(t=>`<button type="button" class="chip ${F.by===t.id?'on':''}" style="--c:var(--blue)" data-a="setF" data-k="by" data-v="${esc(t.id)}">${esc(t.name)}${t.id===myId()?' (yo)':''}</button>`).join('')||'<span class="sub">Añade personas en Equipo.</span>'}</div></div>
+<div class="fld"><span class="lbl">Próxima revisión</span><div class="chips">${NEXT.map(([l,d])=>`<button type="button" class="chip ${+F.next===d?'on':''}" style="--c:var(--green)" data-a="setF" data-k="next" data-v="${d}">${l}</button>`).join('')}</div></div>
+${photoPicker()}
+<div class="fld"><button type="button" class="toggle ${F.notify?'on':''}" data-a="togF" data-k="notify"><span class="sw"></span><span class="grow"><b>Avisar en el chat</b><div class="sub">Publica el trabajo en el chat del equipo.</div></span></button></div>
+<button type="submit" class="btn pri full" ${F.busy?'disabled':''}>${ic('check')}${F.busy?'Guardando…':'Guardar mantenimiento'}</button>
+</form>`;
+};
+VIEWS['editar-averia']=c=>{
+if(!ready('faults','machines'))return skel();
+const f=byId('faults',c.id);if(!f)return empty('help','Avería no encontrada','Puede que se haya borrado.');
+if(F._for!=='ef'+f.id)F={_for:'ef'+f.id,machineId:f.machineId||'',title:f.title||'',description:f.description||''};
+return `<form class="card" data-a="saveEditFault">
+<div class="fld"><label for="efm">Máquina</label>${machineSelect('efm',F.machineId,true)}</div>
+<div class="fld"><label for="eft">¿Qué pasa?</label><input class="inp" id="eft" data-f="title" value="${esc(F.title)}" required></div>
+<div class="fld">${lblMic('efd','Descripción','description')}<textarea class="inp" id="efd" data-f="description">${esc(F.description)}</textarea></div>
+<div class="btns"><button type="button" class="btn" data-a="back">Cancelar</button><button type="submit" class="btn pri">${ic('check')}Guardar cambios</button></div>
+<button type="button" class="btn ghost full" style="color:var(--red);margin-top:10px" data-a="askDelFault">${ic('trash')}Borrar avería</button>
+</form>`;
+};
+VIEWS['editar-mant']=c=>{
+if(!ready('maintenances','machines','team'))return skel();
+const x=byId('maintenances',c.id);if(!x)return empty('help','Registro no encontrado');
+if(F._for!=='em'+x.id)F={_for:'em'+x.id,type:x.type,title:x.title||'',description:x.description||'',parts:x.parts||'',duration:x.durationMin?String(x.durationMin):'',by:x.doneById||''};
+return `<form class="card" data-a="saveEditMant">
+<div class="sub" style="margin-bottom:12px">${esc(machineLabel(x.machineId))} · ${fmtDT(x.doneAt)}</div>
+<div class="fld"><span class="lbl">Tipo</span><div class="chips">${MAINT_TYPES.map(t=>`<button type="button" class="chip ${F.type===t?'on':''}" style="--c:var(--${MT_C[t]})" data-a="setF" data-k="type" data-v="${t}">${t}</button>`).join('')}</div></div>
+<div class="fld"><label for="emt">Trabajo realizado</label><input class="inp" id="emt" data-f="title" value="${esc(F.title)}" required></div>
+<div class="fld">${lblMic('emd','Detalles','description')}<textarea class="inp" id="emd" data-f="description">${esc(F.description)}</textarea></div>
+<div class="fld"><label for="emp">Recambios usados</label><input class="inp" id="emp" data-f="parts" value="${esc(F.parts)}"></div>
+<div class="fld"><label for="emdu">Duración (minutos)</label><input class="inp num" id="emdu" data-f="duration" inputmode="numeric" value="${esc(F.duration)}">
+<div class="chips" style="margin-top:4px">${[15,30,60,90,120].map(v=>`<button type="button" class="chip ${String(F.duration)===String(v)?'on':''}" data-a="setF" data-k="duration" data-v="${v}">${v<60?v+' min':String(v/60).replace('.',',')+' h'}</button>`).join('')}</div></div>
+<div class="fld"><span class="lbl">Realizado por</span><div class="chips">${S.team.map(t=>`<button type="button" class="chip ${F.by===t.id?'on':''}" style="--c:var(--blue)" data-a="setF" data-k="by" data-v="${esc(t.id)}">${esc(t.name)}</button>`).join('')}</div></div>
+<div class="btns"><button type="button" class="btn" data-a="back">Cancelar</button><button type="submit" class="btn pri">${ic('check')}Guardar cambios</button></div>
+</form>`;
+};
+/* ---------- CHAT ---------- */
+VIEWS.chat=()=>{
+if(!ready('messages','team'))return skel();
+const msgs=[...S.messages].sort((a,b)=>a.createdAt-b.createdAt),me=myId();
+let last='',prevAuthor=null,h='';
+for(const m of msgs){
+const d=fmtD(m.createdAt);if(d!==last){h+=`<div class="day">${d===fmtD(Date.now())?'Hoy':d===fmtD(Date.now()-DAY)?'Ayer':d}</div>`;last=d;prevAuthor=null}
+if(m.kind==='sys'){h+=`<div class="sys" ${m.refType?`data-a="go" data-v="${esc(m.refType)}" data-id="${esc(m.refId)}"`:''}>${ic(m.icon||'megaphone')}<span><b>${esc(nm(m.authorId))}</b> ${esc(m.text)} <span class="sub">· ${fmtT(m.createdAt)}</span></span></div>`;prevAuthor=null;continue}
+const mine=me&&m.authorId===me,show=!mine&&prevAuthor!==m.authorId;
+h+=`<div class="msg ${mine?'me':''}">${!mine?`<span style="width:30px;flex:none">${show?av(nm(m.authorId),30):''}</span>`:''}
+<div class="bub" ${mine?`data-a="selMsg" data-id="${esc(m.id)}"`:''}>${show?`<span class="who">${esc(nm(m.authorId))}</span>`:''}
+${m.photo?`<img src="${esc(blobUrl(m.photo))}" alt="Foto" data-a="lightbox" data-src="${esc(blobUrl(m.photo))}" loading="lazy">`:''}
+${m.text?`<span class="tx">${esc(m.text)}</span>`:''}<span class="tm">${fmtT(m.createdAt)}</span>
+${app.selMsg===m.id?`<button class="delm" data-a="delMsg" data-id="${esc(m.id)}">Borrar para todos</button>`:''}</div></div>`;
+prevAuthor=m.authorId;
+}
+return `<div class="chat" id="chatlist">${h||empty('chat','Aún no hay mensajes','Saluda al equipo o comparte una foto del turno.')}</div>
+<form class="composer" data-w data-a="sendMsg"><div class="box">
+${ASSETS?`<label class="ib" for="chatPh" aria-label="Enviar foto">${ic('camera')}</label><input type="file" id="chatPh" accept="image/*" hidden data-a-change="chatPhoto">`:''}
+<textarea id="chatIn" rows="1" data-f="chat" placeholder="${me?'Escribe un mensaje…':'Elige quién eres para escribir'}" ${me?'':'disabled'}>${esc(F.chat||'')}</textarea>
+${me?mic('chat','chatIn'):''}<button class="ib send" type="submit" aria-label="Enviar" ${(F.chat||'').trim()&&!F.sending?'':'disabled'}>${ic('send')}</button></div></form>`;
+};
+let chatSeen=0;
+function afterChat(){const n=S.messages.length;const near=(innerHeight+scrollY)>=document.body.scrollHeight-260;if(n!==chatSeen||near){chatSeen=n;requestAnimationFrame(()=>scrollTo(0,document.body.scrollHeight))}}
+/* ---------- CALENDARIO ---------- */
+VIEWS.calendario=()=>{
+if(!ready('machines','maintenances'))return skel();
+const now=new Date();if(!app.cal)app.cal={y:now.getFullYear(),m:now.getMonth(),sel:sod(Date.now())};
+const {y,m}=app.cal;const first=new Date(y,m,1),start=new Date(y,m,1-((first.getDay()+6)%7));
+const monthEnd=new Date(y,m+1,0,23,59).getTime();
+const events={};const add=(t,e)=>{const k=sod(t);(events[k]=events[k]||[]).push(e)};
+const rangeStart=start.getTime(),rangeEnd=rangeStart+42*DAY;
+S.machines.forEach(mc=>{if(!mc.nextDueAt)return;let t=mc.nextDueAt,k=0;
+while(t<rangeEnd&&k<60){if(t>=rangeStart)add(t,{k:k?'proj':'due',m:mc,t});if(!mc.intervalDays)break;t+=mc.intervalDays*DAY;k++}});
+S.maintenances.forEach(x=>{if(x.doneAt>=rangeStart&&x.doneAt<rangeEnd)add(x.doneAt,{k:'done',x})});
+const today=sod(Date.now());let cells='';
+for(let i=0;i<42;i++){const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i);const k=d.getTime();const ev=events[k]||[];
+const dots=ev.slice(0,6).map(e=>e.k==='done'?`<i style="--c:var(--green)"></i>`:e.k==='proj'?`<i class="pj" style="--c:var(--orange)"></i>`:`<i style="--c:var(--${k<today?'red':'orange'})"></i>`).join('');
+cells+=`<button class="${d.getMonth()!==m?'out':''} ${k===today?'today':''} ${k===app.cal.sel?'sel':''}" data-a="calSel" data-t="${k}" aria-label="${d.getDate()} de ${MESES[d.getMonth()]}"><span class="dn">${d.getDate()}</span><span class="dots">${dots}</span></button>`}
+const sel=events[app.cal.sel]||[];
+const overdue=S.machines.filter(x=>{const d=daysUntil(x.nextDueAt);return d!==null&&d<0}).sort((a,b)=>a.nextDueAt-b.nextDueAt);
+const monthDue=S.machines.filter(x=>x.nextDueAt&&x.nextDueAt>=first.getTime()&&x.nextDueAt<=monthEnd).length;
+return `${overdue.length?`<div class="card" style="border-color:color-mix(in srgb,var(--red) 45%,var(--line));margin-bottom:14px"><div class="lbl" style="color:var(--red);margin-bottom:6px">Revisiones vencidas</div>
+${overdue.map(x=>`<div class="due" style="--c:var(--red)" data-a="go" data-v="maquina" data-id="${esc(x.id)}"><span class="plate">${esc(x.code)}</span><div class="grow"><div class="t" style="font-size:15px">${esc(x.name)}</div><div class="sub">Tocaba el ${fmtD(x.nextDueAt)}</div></div><span class="dd num">${-daysUntil(x.nextDueAt)}<small>días tarde</small></span></div>`).join('')}</div>`:''}
+<div class="calhead"><button class="btn sm" data-a="calMove" data-v="-1" aria-label="Mes anterior">${ic('back')}</button><h2>${MESES[m]} ${y}</h2><button class="btn sm" data-a="calToday">Hoy</button><button class="btn sm" data-a="calMove" data-v="1" aria-label="Mes siguiente">${ic('chev')}</button></div>
+<div class="cal">${['L','M','X','J','V','S','D'].map(d=>`<div class="wd">${d}</div>`).join('')}${cells}</div>
+<div class="legend"><span><i style="--c:var(--orange)"></i>Revisión prevista</span><span><i class="pj" style="--c:var(--orange)"></i>Siguientes según intervalo</span><span><i style="--c:var(--red)"></i>Vencida</span><span><i style="--c:var(--green)"></i>Trabajo hecho</span><span>· ${plural(monthDue,'revisión','revisiones')} este mes</span></div>
+<div class="sec"><h2>${esc(longDate(app.cal.sel))}</h2></div>
+<div class="stack">${sel.length?sel.map(e=>e.k==='done'?maintCard(e.x):
+`<div class="card tap mcard" data-a="go" data-v="maquina" data-id="${esc(e.m.id)}"><span class="plate">${esc(e.m.code)}</span><div class="grow"><div class="t">${esc(e.m.name)}</div><div class="sub">${e.k==='proj'?'Revisión prevista según el intervalo de '+e.m.intervalDays+' días':'Revisión programada'}${e.m.location?' · '+esc(e.m.location):''}</div></div>${badge(e.k==='proj'?'Prevista':(e.t<today?'Vencida':'Pendiente'),e.k==='proj'?'muted':(e.t<today?'red':'orange'))}</div>`).join('')
+:empty('cal','Nada este día','Elige otro día del calendario.')}</div>`;
+};
+/* ---------- INFORMES ---------- */
+VIEWS.informes=()=>{
+if(!ready('machines','maintenances','faults','team'))return skel();
+const days=app.rep.days,from=Date.now()-days*DAY,now=Date.now();
+const ms=S.maintenances.filter(x=>x.doneAt>=from);
+const fs=S.faults.filter(f=>f.createdAt>=from);
+const closed=S.faults.filter(f=>f.closedAt&&f.closedAt>=from);
+const mttr=closed.length?closed.reduce((s,f)=>s+(f.closedAt-f.createdAt),0)/closed.length:null;
+const downBy={};let down=0;
+S.faults.filter(f=>f.stopped).forEach(f=>{const a=Math.max(f.createdAt,from),b=f.closedAt||now;if(b>a){down+=b-a;downBy[f.machineId]=(downBy[f.machineId]||0)+(b-a)}});
+const mins=ms.reduce((s,x)=>s+(x.durationMin||0),0);
+const byType=MAINT_TYPES.map(t=>({l:t,v:ms.filter(x=>x.type===t).length,c:MT_C[t]})).filter(r=>r.v);
+const byTech=S.team.map(t=>({l:t.name,v:ms.filter(x=>x.doneById===t.id).reduce((s,x)=>s+(x.durationMin||0),0),n:ms.filter(x=>x.doneById===t.id).length,c:'blue'})).filter(r=>r.n).sort((a,b)=>b.v-a.v);
+const byMachF=S.machines.map(m=>({l:m.code+' · '+m.name,v:fs.filter(f=>f.machineId===m.id).length,c:'red'})).filter(r=>r.v).sort((a,b)=>b.v-a.v).slice(0,8);
+const byDown=Object.entries(downBy).map(([id,v])=>({l:machineLabel(id),v:v/HOUR,c:'red'})).sort((a,b)=>b.v-a.v).slice(0,8);
+const prev=ms.filter(x=>x.type==='Preventivo').length;
+const withDate=S.machines.filter(m=>m.nextDueAt),onTime=withDate.filter(m=>daysUntil(m.nextDueAt)>=0);
+const bars=(rows,fmt)=>{if(!rows.length)return '<div class="sub">Sin datos en este periodo.</div>';const max=Math.max(...rows.map(r=>r.v),1);
+return `<div class="bars">${rows.map(r=>`<div class="bar"><span class="bl" title="${esc(r.l)}">${esc(r.l)}</span><span class="bt"><i style="width:${Math.max(2,r.v/max*100)}%;background:var(--${r.c})"></i></span><span class="bv num">${fmt(r)}</span></div>`).join('')}</div>`};
+return `<div class="chips" style="margin-bottom:14px">${[[7,'7 días'],[30,'30 días'],[90,'3 meses'],[365,'12 meses']].map(([d,l])=>`<button class="chip ${days===d?'on':''}" data-a="repDays" data-v="${d}">${l}</button>`).join('')}</div>
+<div class="kpis">
+<div class="card kpi"><div class="n num">${ms.length}</div><div class="l">Trabajos · ${hrs(mins)} h</div></div>
+<div class="card kpi"><div class="n num">${fs.length}</div><div class="l">Averías reportadas · ${plural(closed.length,'cerrada','cerradas')}</div></div>
+<div class="card kpi"><div class="n num">${mttr==null?'—':(mttr/HOUR).toLocaleString('es-ES',{maximumFractionDigits:1})}<small>${mttr==null?'':'h'}</small></div><div class="l">Tiempo medio de reparación</div></div>
+<div class="card kpi"><div class="n num">${(down/HOUR).toLocaleString('es-ES',{maximumFractionDigits:1})}<small>h</small></div><div class="l">Máquinas paradas (total)</div></div>
+</div>
+<div class="grid2" style="margin-top:12px">
+<div class="card"><div class="lbl" style="margin-bottom:12px">Trabajos por tipo</div>${bars(byType,r=>r.v)}</div>
+<div class="card"><div class="lbl" style="margin-bottom:12px">Horas por técnico</div>${bars(byTech,r=>hrs(r.v)+' h')}</div>
+<div class="card"><div class="lbl" style="margin-bottom:12px">Averías por máquina</div>${bars(byMachF,r=>r.v)}</div>
+<div class="card"><div class="lbl" style="margin-bottom:12px">Horas de parada por máquina</div>${bars(byDown,r=>r.v.toLocaleString('es-ES',{maximumFractionDigits:1})+' h')}</div>
+</div>
+<div class="card" style="margin-top:12px"><div class="lbl" style="margin-bottom:8px">Plan preventivo</div>
+<div>${prev} preventivos en el periodo (${ms.length?Math.round(prev/ms.length*100):0} % del trabajo). ${withDate.length?`${onTime.length} de ${withDate.length} máquinas con fecha tienen la revisión al día.`:'Ninguna máquina tiene fecha de revisión todavía.'}</div></div>
+<div class="sec"><h2>Exportar</h2></div>
+<div class="btns"><button class="btn" data-a="csv" data-v="maintenances">${ic('download')}Mantenimientos (.csv)</button><button class="btn" data-a="csv" data-v="faults">${ic('download')}Averías (.csv)</button><button class="btn" data-a="csv" data-v="machines">${ic('download')}Máquinas (.csv)</button></div>
+<p class="sub">Los CSV se abren directamente en Excel o Google Sheets e incluyen todo el historial, no solo el periodo elegido.</p>`;
+};
+/* ---------- EQUIPO ---------- */
+VIEWS.equipo=()=>{
+if(!ready('team','maintenances','faults'))return skel();
+const m=meM(),theme=lsGet('mecateam-theme','system');
+const st=id=>({n:S.maintenances.filter(x=>x.doneById===id).length,o:S.faults.filter(f=>f.assignedToId===id&&f.status!=='Cerrada').length});
+const monthStart=new Date(new Date().getFullYear(),new Date().getMonth(),1).getTime();
+let me='';
+if(m){const s=st(m.id),month=S.maintenances.filter(x=>x.doneById===m.id&&x.doneAt>=monthStart).length;
+if(app.editMe)me=`<form class="card" data-a="saveMe"><div class="fld"><label for="men">Nombre</label><input class="inp" id="men" data-f="meName" value="${esc(F.meName)}" required></div>
+<div class="fld"><label for="mer">Puesto</label><input class="inp" id="mer" data-f="meRole" value="${esc(F.meRole)}" placeholder="Técnico mecatrónico"></div>
+<div class="btns"><button type="button" class="btn" data-a="editMeCancel">Cancelar</button><button class="btn pri" type="submit">${ic('check')}Guardar</button></div></form>`;
+else me=`<div class="card"><div class="me-card">${av(m.name,60)}<div class="grow"><div class="t" style="font-size:20px">${esc(m.name)}</div><div class="sub">${esc(m.role||'Sin puesto')}</div></div><button class="btn sm" data-w data-a="editMe">${ic('edit')}Editar</button></div>
+<div class="kpis" style="margin-top:14px;grid-template-columns:repeat(3,minmax(0,1fr))"><div class="kpi"><div class="n num">${month}</div><div class="l">Este mes</div></div><div class="kpi"><div class="n num">${s.n}</div><div class="l">Trabajos totales</div></div><div class="kpi"><div class="n num" style="color:var(--${s.o?'orange':'ink'})">${s.o}</div><div class="l">Averías asignadas</div></div></div>
+<button class="btn ghost sm" style="margin-top:6px" data-a="notMe">${ic('logout')}No soy ${esc(m.name.split(' ')[0])}</button></div>`;
+}else me=`<div class="card"><div class="t">Aún no has dicho quién eres</div><p class="sub">Así tus trabajos y averías llevan tu nombre.</p><button class="btn pri" data-w data-a="onboard">${ic('user')}Elegir mi nombre</button></div>`;
+const demoN=COLS.reduce((s,c)=>s+S[c].filter(x=>x.demo).length,0);
+return `${me}
+<div class="sec"><h2>Equipo (${S.team.length})</h2><button class="lnk" data-w data-a="addMember">${ic('userplus')} Añadir</button></div>
+${F.addingMember?`<form class="card" data-a="saveMember" style="margin-bottom:10px"><div class="fld"><label for="nmn">Nombre y apellido</label><input class="inp" id="nmn" data-f="newName" value="${esc(F.newName||'')}" placeholder="Laura Gómez" required></div>
+<div class="fld"><label for="nmr">Puesto</label><input class="inp" id="nmr" data-f="newRole" value="${esc(F.newRole||'')}" placeholder="Técnico eléctrico"></div>
+<div class="btns"><button type="button" class="btn" data-a="addMemberCancel">Cancelar</button><button class="btn pri" type="submit">${ic('check')}Añadir</button></div></form>`:''}
+<div class="card">${S.team.length?S.team.map(t=>{const s=st(t.id);return `<div class="member ${app.readOnly?'':'tap'}" ${app.readOnly?'':`data-a="editMember" data-id="${esc(t.id)}"`}>${av(t.name)}<div class="grow"><div class="t" style="font-size:15px">${esc(t.name)}${m&&t.id===m.id?' <span class="sub">(tú)</span>':''}${t.demo?' <span class="sub">· ejemplo</span>':''}</div><div class="sub">${esc(t.role||'—')}</div></div><span class="sub num" style="text-align:right">${s.n} trab.${s.o?`<br><span style="color:var(--orange)">${s.o} asig.</span>`:''}</span></div>`}).join(''):empty('users','Sin personas','Añade a los técnicos del equipo.')}</div>
+<div class="sec"><h2>Apariencia</h2></div>
+<div class="chips">${[['system','Como el sistema'],['light','Claro'],['dark','Oscuro']].map(([v,l])=>`<button class="chip ${theme===v?'on':''}" data-a="theme" data-v="${v}">${l}</button>`).join('')}</div>
+<div class="sec"><h2>Datos</h2></div>
+<div class="card stack">
+<div class="btns"><button class="btn sm" data-a="csv" data-v="maintenances">${ic('download')}Mantenimientos</button><button class="btn sm" data-a="csv" data-v="faults">${ic('download')}Averías</button><button class="btn sm" data-a="csv" data-v="machines">${ic('download')}Máquinas</button></div>
+${demoN&&!app.readOnly?`<button class="btn" style="color:var(--red)" data-a="askDemo">${ic('trash')}Borrar los ${demoN} datos de ejemplo</button>`:''}
+<div class="sub">${app.mode==='db'?'Los datos se comparten en directo con todas las personas que tienen el enlace. El chat guarda los últimos 250 mensajes.':'Modo sin conexión: los datos solo se guardan en este navegador.'}</div>
+</div>`;
+};
+/* ---------- onboarding ---------- */
+let onboardShown=false;
+function maybeOnboard(){
+if(onboardShown||app.readOnly||app.mode==='loading'||!ready('team'))return;
+if(meM())return;
+if(!app.fromQR&&lsGet('mecateam-skip-onboard',false))return;
+onboardShown=true;openOnboard();
+}
+const ROLES=['Técnico mecatrónico','Mecánico','Electricista','Jefe de turno','Operario','Prácticas'];
+function openOnboard(){
+const free=S.team.filter(t=>!t.uid||t.uid===app.uid);
+const qm=app.fromQR?byId('machines',app.fromQR):null;
+sheet(`${app.fromQR?`<div class="row nw" style="margin-bottom:12px">${qm?`<span class="plate">${esc(qm.code)}</span>`:`<span class="logo">${ic('qr')}</span>`}<div class="sub">${qm?'Has escaneado <b>'+esc(qm.name)+'</b>':'Has escaneado una máquina'}</div></div>`:''}
+<h3>${app.fromQR?'Únete al equipo':'¿Quién eres?'}</h3>
+<p>${app.fromQR?'Es la primera vez que entras en MecaTeam. Pon tu nombre y tu función para poder ver la máquina, anotar trabajos y reportar averías.':'Elige tu nombre para que tus trabajos, averías y mensajes salgan firmados por ti.'}</p>
+<form data-a="obNew" class="card">
+<div class="fld"><label for="obn">Nombre y apellido</label><input class="inp" id="obn" data-f="obName" value="${esc(F.obName||'')}" placeholder="Laura Gómez" autocomplete="name" required></div>
+<div class="fld"><label for="obr">Función en el equipo</label>
+<div class="chips" style="margin-bottom:4px">${ROLES.map(r=>`<button type="button" class="chip ${F.obRole===r?'on':''}" data-a="obRole" data-v="${esc(r)}">${esc(r)}</button>`).join('')}</div>
+<input class="inp" id="obr" data-f="obRole" value="${esc(F.obRole||'')}" placeholder="O escríbela: Técnico de robots, Calidad…" required></div>
+<button class="btn pri full" type="submit">${ic('check')}Entrar al equipo</button></form>
+${free.length?`<div class="lbl" style="margin:18px 0 8px">¿Ya estás en el equipo? Elige tu nombre</div>
+${free.map(t=>`<button class="pick" data-a="iam" data-id="${esc(t.id)}">${av(t.name)}<span class="grow"><b>${esc(t.name)}</b><div class="sub">${esc(t.role||'')}${t.demo?' · ejemplo':''}</div></span>${ic('chev')}</button>`).join('')}`:''}
+<button class="btn ghost full" style="margin-top:8px" data-a="obSkip">Ahora no, solo quiero mirar</button>`);
+setTimeout(()=>{const n=document.getElementById('obn');if(n&&!n.value&&matchMedia('(pointer:fine)').matches)n.focus()},60);
+if(USER&&!F.obName){USER.me().then(v=>{if(v&&v.name&&!F.obName){F.obName=v.name;const n=document.getElementById('obn');if(n&&!n.value)n.value=v.name}}).catch(()=>{})}
+}
+/* ---------- overlays ---------- */
+function sheet(html){$('#ovl').innerHTML=`<div class="ov" data-a="ovClose"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`}
+function closeSheet(){$('#ovl').innerHTML=''}
+function confirmBox(title,text,ok,cls,fn){
+sheet(`<h3>${esc(title)}</h3><p>${esc(text)}</p><div class="btns"><button class="btn" data-a="ovCloseBtn">Cancelar</button><button class="btn ${cls}" data-a="confirmOk">${esc(ok)}</button></div>`);
+pendingConfirm=fn;
+}
+let pendingConfirm=null,toastT=0;
+function toast(msg,kind){let t=document.querySelector('.toast');if(!t){t=document.createElement('div');document.body.appendChild(t)}t.className='toast '+(kind||'');t.setAttribute('role','status');t.textContent=msg;clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),kind==='err'?5200:2600)}
+/* ---------- QR ---------- */
+const machineUrl=id=>ART_URL+'#maq-'+id;
+function qrSvg(text){
+if(typeof qrcode!=='function')return null;
+try{const q=qrcode(0,'M');q.addData(text);q.make();return q.createSvgTag({cellSize:4,margin:0,scalable:true})}catch(e){return null}
+}
+function hydrateQR(){document.querySelectorAll('[data-qr]').forEach(el=>{const s=qrSvg(machineUrl(el.dataset.qr));el.innerHTML=s||'<div class="ph">QR no disponible sin conexión</div>'})}
+const qrStyle='@page{margin:10mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:0}.grid{display:flex;flex-wrap:wrap;gap:6mm}.label{border:.6mm solid #111;border-radius:3mm;padding:4mm;page-break-inside:avoid;break-inside:avoid}.qr svg{width:100%;height:auto;display:block}.brand{font-size:8pt;letter-spacing:1pt;text-transform:uppercase;color:#555}.code{font-weight:800;font-size:20pt;font-family:"Courier New",monospace}.name{font-weight:700;font-size:12pt;margin-top:1mm}.muted{color:#555;font-size:9pt}.row{display:flex;justify-content:space-between;gap:3mm;font-size:10pt;padding:1.2mm 0;border-bottom:.3mm solid #ddd}.stripe{background:#111;color:#fff;padding:1.5mm 3mm;font-weight:800;font-size:11pt;border-radius:1.5mm;display:inline-block}.tip{font-size:10pt;color:#555;margin-bottom:6mm}@media print{.tip{display:none}}';
+async function saveFile(filename,data,mime){
+if(DL){try{await DL.save({filename,data});return true}catch(e){if(e&&e.code==='declined')return false;}}
+// Respaldo: mostrar el contenido para copiarlo
+sheet(`<h3>${esc(filename)}</h3><p>No se puede descargar desde esta vista. Copia el contenido y pégalo en un archivo nuevo.</p><textarea class="inp csv" id="fallbackTxt" readonly>${esc(typeof data==='string'?data:'')}</textarea><div class="btns" style="margin-top:10px"><button class="btn" data-a="ovCloseBtn">Cerrar</button><button class="btn pri" data-a="copyFallback">${ic('copy')}Copiar</button></div>`);
+return false;
+}
+/* ---------- CSV ---------- */
+function csvOf(col){
+const q=v=>{v=v==null?'':String(v);return /[;"\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+let head,rows;
+if(col==='maintenances'){head=['Fecha','Código','Máquina','Tipo','Trabajo','Detalles','Recambios','Duración (min)','Técnico','Próxima revisión'];
+rows=S.maintenances.map(x=>{const m=byId('machines',x.machineId);return[fmtDT(x.doneAt),m?.code,m?.name,x.type,x.title,x.description,x.parts,x.durationMin,nm(x.doneById),x.nextDueAt?fmtD(x.nextDueAt):'']})}
+else if(col==='faults'){head=['Fecha','Código','Máquina','Avería','Descripción','Prioridad','Estado','Máquina parada','Reportada por','Asignada a','Cerrada','Horas abierta','Solución'];
+rows=S.faults.map(f=>{const m=byId('machines',f.machineId);return[fmtDT(f.createdAt),m?.code,m?.name,f.title,f.description,f.priority,f.status,f.stopped?'Sí':'No',nm(f.createdById),f.assignedToId?nm(f.assignedToId):'',f.closedAt?fmtDT(f.closedAt):'',(((f.closedAt||Date.now())-f.createdAt)/HOUR).toFixed(1).replace('.',','),f.resolution]})}
+else{head=['Código','Máquina','Ubicación','Estado','Último mantenimiento','Próxima revisión','Intervalo (días)','Notas'];
+rows=S.machines.map(m=>[m.code,m.name,m.location,mState(m)[0],m.lastMaintenanceAt?fmtD(m.lastMaintenanceAt):'',m.nextDueAt?fmtD(m.nextDueAt):'',m.intervalDays||'',m.description])}
+return '﻿'+[head,...rows].map(r=>r.map(q).join(';')).join('\r\n');
+}
+/* ---------- fotos ---------- */
+function compress(file){return new Promise((res,rej)=>{const img=new Image();const u=URL.createObjectURL(file);img.onload=()=>{const max=1600;let {width:w,height:h}=img;const s=Math.min(1,max/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s);
+const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(u);c.toBlob(b=>b?res(b):rej(new Error('foto')),'image/jpeg',.78)};img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('foto'))};img.src=u})}
+async function uploadAll(list){const ids=[];for(const p of list||[]){const b=await compress(p.file);const r=await ASSETS.upload(b,{type:'image/jpeg'});ids.push(r.id)}return ids}
+/* ---------- acciones ---------- */
+function stopDict(){if(DICT&&dictState==='listening'){try{DICT.stop().catch(()=>{})}catch(e){}}}
+function go(v,params){stopDict();app.anim=true;app.stack.push({v,...params});F={};app.closing=false;app.selMsg=null;render();scrollTo(0,0)}
+function tab(v){stopDict();app.anim=true;app.stack=[{v}];F={};app.closing=false;app.selMsg=null;app.editMe=false;render();scrollTo(0,0)}
+function back(){stopDict();app.anim=true;if(app.stack.length>1)app.stack.pop();else app.stack=[{v:'inicio'}];F={};app.closing=false;render();scrollTo(0,0)}
+function replaceTop(v,params){app.stack[app.stack.length-1]={v,...params};F={};render();scrollTo(0,0)}
+const logE=(f,x)=>[...(f.log||[]),{t:Date.now(),by:myId(),x}].slice(-60);
+async function sysMsg(text,icon,refType,refId){try{await put('messages',rid(),{kind:'sys',text,icon,refType:refType||null,refId:refId||null,authorId:myId(),createdAt:Date.now()})}catch(e){}}
+function needMe(){if(!myId()){toast('Antes dinos quién eres.');openOnboard();return false}return true}
+const A={
+tab:d=>tab(d.v), back:()=>back(),
+go:d=>go(d.v,{id:d.id}),
+newFault:d=>{if(needMe())go('nueva-averia',{mid:d.mid||''})},
+newMant:d=>{if(needMe())go('nuevo-mant',{mid:d.mid||''})},
+newMachine:()=>go('form-maquina',{}),
+dict:d=>{if(!DICT)return;
+if(dictState==='listening'){const same=dictKey===d.k;try{DICT.stop().catch(()=>{})}catch(e){}if(same)return}
+dictKey=d.k;dictEl=d.el;dictState='listening';paintMic();
+let p;try{p=DICT.start()}catch(e){p=Promise.reject(e)}
+Promise.resolve(p).catch(e=>{const c=(e&&(e.code||e.reason||e.message))||'';dictKey=null;dictEl=null;dictState='idle';
+if(String(c).includes('not_granted')){DICT=null;toast('Sin permiso de micrófono: puedes seguir escribiendo.');render()}else{paintMic();if(!String(c).includes('dismissed'))toast('No se ha podido usar el dictado.','err')}})},
+editMember:d=>{const t=member(d.id);if(!t)return;F.emName=t.name;F.emRole=t.role||'';F.emId=t.id;
+const s=S.maintenances.filter(x=>x.doneById===t.id).length;
+sheet(`<h3>${esc(t.name)}</h3><p>${plural(s,'trabajo registrado','trabajos registrados')}${t.uid?' · cuenta vinculada':''}</p>
+<form data-a="saveMemberEdit"><div class="fld"><label for="emn">Nombre</label><input class="inp" id="emn" data-f="emName" value="${esc(F.emName)}" required></div>
+<div class="fld"><label for="emr">Puesto</label><input class="inp" id="emr" data-f="emRole" value="${esc(F.emRole)}" placeholder="Técnico mecatrónico"></div>
+<div class="btns"><button type="button" class="btn" data-a="ovCloseBtn">Cancelar</button><button class="btn pri" type="submit">${ic('check')}Guardar</button></div></form>
+<button class="btn ghost full" style="color:var(--red);margin-top:10px" data-a="askDelMember" data-id="${esc(t.id)}">${ic('trash')}Quitar del equipo</button>`)},
+askDelMember:d=>{const t=member(d.id);if(!t)return;
+confirmBox('¿Quitar a '+t.name+'?','Su ficha desaparece del equipo. Sus trabajos y averías se conservan en el historial.','Quitar','dan',async()=>{try{await del('team',t.id);if(lsGet('mecateam-me',null)===t.id)lsSet('mecateam-me',null);toast(t.name+' ya no está en el equipo');render()}catch(e){}})},
+askDelFault:()=>{const f=byId('faults',cur().id);if(!f)return;
+confirmBox('¿Borrar esta avería?','Se borra «'+f.title+'» para todo el equipo, con su seguimiento. No se puede deshacer.','Borrar avería','dan',async()=>{try{await del('faults',f.id);app.stack=[{v:'averias'}];F={};render();toast('Avería borrada')}catch(e){}})},
+filAv:d=>{app.fil.averias=d.v;render()},
+filMine:()=>{app.fil.registroMine=!app.fil.registroMine;render()},
+filType:d=>{app.fil.registroType=d.v||null;render()},
+setF:d=>{F[d.k]=d.v;render()},
+togF:d=>{F[d.k]=!F[d.k];render()},
+rmPhoto:d=>{F.photos.splice(+d.i,1);render()},
+lightbox:d=>{$('#ovl').innerHTML=`<div class="lb" data-a="ovClose"><img src="${esc(d.src)}" alt="Foto"><button data-a="ovCloseBtn" aria-label="Cerrar">${ic('x')}</button></div>`},
+ovClose:(d,el,ev)=>{if(ev.target===el)closeSheet()},
+ovCloseBtn:()=>closeSheet(),
+confirmOk:async()=>{const fn=pendingConfirm;pendingConfirm=null;closeSheet();if(fn)await fn()},
+copyFallback:async()=>{const t=$('#fallbackTxt');try{await navigator.clipboard.writeText(t.value);toast('Copiado')}catch(e){t.select();toast('Selecciona y copia con Ctrl+C')}},
+copyLink:async d=>{const u=machineUrl(d.id);try{await navigator.clipboard.writeText(u);toast('Enlace copiado')}catch(e){sheet(`<h3>Enlace de la máquina</h3><p>Copia este enlace:</p><input class="inp" id="lnkTxt" readonly value="${esc(u)}"><div class="btns" style="margin-top:10px"><button class="btn" data-a="ovCloseBtn">Cerrar</button></div>`);setTimeout(()=>{const n=$('#lnkTxt');n&&n.select()},50)}},
+gotoCode:()=>{const q=(app.q.goto||'').trim().toUpperCase();if(!q)return;const m=S.machines.find(x=>String(x.code).toUpperCase()===q)||S.machines.find(x=>String(x.code).toUpperCase().includes(q)||x.name.toUpperCase().includes(q));
+if(m){app.q.goto='';go('maquina',{id:m.id})}else toast('No hay ninguna máquina con «'+q+'».','err')},
+// averías
+takeFault:async()=>{const f=byId('faults',cur().id);if(!f||!needMe())return;try{await patch('faults',f.id,{assignedToId:myId(),status:f.status==='Abierta'?'En curso':f.status,log:logE(f,'Se la queda '+nm(myId()))});toast('Avería asignada a ti')}catch(e){}},
+assign:async d=>{const f=byId('faults',cur().id);if(!f)return;try{await patch('faults',f.id,{assignedToId:d.id,status:f.status==='Abierta'?'En curso':f.status,log:logE(f,'Asignada a '+nm(d.id))})}catch(e){}},
+prio:async d=>{const f=byId('faults',cur().id);if(!f||f.priority===d.v)return;try{await patch('faults',f.id,{priority:d.v,log:logE(f,'Prioridad '+d.v)})}catch(e){}},
+toggleStop:async()=>{const f=byId('faults',cur().id);if(!f)return;try{await patch('faults',f.id,{stopped:!f.stopped,log:logE(f,f.stopped?'Máquina de nuevo en marcha':'Máquina parada')})}catch(e){}},
+repairClose:()=>{const f=byId('faults',cur().id);if(f&&needMe())go('nuevo-mant',{mid:f.machineId,fid:f.id})},
+closeOpen:()=>{app.closing=true;render();setTimeout(()=>{const n=$('#resol');n&&n.focus()},30)},
+closeCancel:()=>{app.closing=false;render()},
+closeFault:async()=>{const f=byId('faults',cur().id);if(!f||!needMe())return;const r=(F.resol||'').trim();if(!r){toast('Escribe brevemente cómo se ha resuelto.','err');return}
+try{await patch('faults',f.id,{status:'Cerrada',resolution:r,closedAt:Date.now(),closedById:myId(),log:logE(f,'Cerrada: '+r)});app.closing=false;F.resol='';
+sysMsg('ha cerrado la avería «'+f.title+'»: '+r,'check','averia',f.id);toast('Avería cerrada')}catch(e){}},
+reopen:async()=>{const f=byId('faults',cur().id);if(!f)return;try{await patch('faults',f.id,{status:f.assignedToId?'En curso':'Abierta',closedAt:null,closedById:null,log:logE(f,'Reabierta')});toast('Avería reabierta')}catch(e){}},
+// mantenimientos
+askDelMant:()=>{const x=byId('maintenances',cur().id);if(!x)return;confirmBox('¿Borrar este registro?','Se borrará «'+x.title+'» del historial para todo el equipo. No se puede deshacer.','Borrar','dan',async()=>{try{await del('maintenances',x.id);back();toast('Registro borrado')}catch(e){}})},
+dlMantLabel:async()=>{const x=byId('maintenances',cur().id);if(!x)return;const m=byId('machines',x.machineId);const svg=qrSvg(machineUrl(x.machineId))||'';
+const html=`<!doctype html><html><head><meta charset="utf-8"><title>Mantenimiento ${esc(m?.code||'')}</title><style>${qrStyle}</style></head><body><p class="tip">Imprime esta página (Ctrl+P) en papel adhesivo.</p><div class="label" style="width:90mm"><div style="display:flex;gap:4mm;align-items:flex-start"><div style="flex:1"><span class="stripe">MANTENIMIENTO REALIZADO</span><div class="code" style="font-size:16pt;margin-top:2mm">${esc(m?.code||'')}</div><div class="name">${esc(m?.name||'')}</div></div><div class="qr" style="width:22mm">${svg}</div></div><div style="margin-top:3mm"><div class="row"><span>Tipo</span><b>${esc(x.type)}</b></div><div class="row"><span>Trabajo</span><b>${esc(x.title)}</b></div><div class="row"><span>Fecha</span><b>${fmtDT(x.doneAt)}</b></div><div class="row"><span>Técnico</span><b>${esc(nm(x.doneById))}</b></div><div class="row" style="border:none"><span>Próxima revisión</span><b>${x.nextDueAt?fmtD(x.nextDueAt):'—'}</b></div></div><div class="muted" style="margin-top:2mm">Escanea el QR para ver el historial completo.</div></div></body></html>`;
+await saveFile('mantenimiento-'+(m?.code||'maquina')+'.html',html)},
+// máquinas
+dlLabels:async d=>{const ids=d.id?[d.id]:(F.sel||[]);const ms=ids.map(id=>byId('machines',id)).filter(Boolean);if(!ms.length)return;
+const labs=ms.map(m=>`<div class="label" style="width:58mm"><div class="qr">${qrSvg(machineUrl(m.id))||''}</div><div style="margin-top:3mm" class="brand">MecaTeam · Mantenimiento</div><div class="code">${esc(m.code||'—')}</div><div class="name">${esc(m.name)}</div><div class="muted">${esc(m.location||'')}</div></div>`).join('');
+const html=`<!doctype html><html><head><meta charset="utf-8"><title>Etiquetas QR MecaTeam</title><style>${qrStyle}</style></head><body><p class="tip">Imprime esta página (Ctrl+P) en papel adhesivo y recorta cada etiqueta.</p><div class="grid">${labs}</div></body></html>`;
+if(await saveFile(ms.length===1?'etiqueta-'+ms[0].code+'.html':'etiquetas-qr.html',html))toast('Etiquetas descargadas')},
+labTog:d=>{const i=F.sel.indexOf(d.id);if(i>=0)F.sel.splice(i,1);else F.sel.push(d.id);render()},
+labAll:()=>{F.sel=S.machines.map(m=>m.id);render()},
+labNone:()=>{F.sel=[];render()},
+askDelMachine:()=>{const m=byId('machines',cur().id);if(!m)return;const n=S.maintenances.filter(x=>x.machineId===m.id).length;
+confirmBox('¿Borrar '+m.code+'?',`Se borra la ficha de la máquina. Sus ${n} registros de mantenimiento se conservan pero quedarán sin máquina.`,'Borrar máquina','dan',async()=>{try{await del('machines',m.id);app.stack=[{v:'maquinas'}];F={};render();toast('Máquina borrada')}catch(e){}})},
+// chat
+selMsg:d=>{app.selMsg=app.selMsg===d.id?null:d.id;render()},
+delMsg:async d=>{app.selMsg=null;try{await del('messages',d.id)}catch(e){}},
+// calendario / informes
+calSel:d=>{app.cal.sel=+d.t;const t=new Date(+d.t);if(t.getMonth()!==app.cal.m){app.cal.m=t.getMonth();app.cal.y=t.getFullYear()}render()},
+calMove:d=>{let m=app.cal.m+(+d.v),y=app.cal.y;if(m<0){m=11;y--}if(m>11){m=0;y++}app.cal.m=m;app.cal.y=y;render()},
+calToday:()=>{app.cal=null;render()},
+repDays:d=>{app.rep.days=+d.v;render()},
+csv:async d=>{const names={maintenances:'mantenimientos',faults:'averias',machines:'maquinas'};const day=new Date();
+if(await saveFile(`mecateam-${names[d.v]}-${day.getFullYear()}${pad(day.getMonth()+1)}${pad(day.getDate())}.csv`,csvOf(d.v)))toast('Archivo descargado')},
+// equipo
+theme:d=>{lsSet('mecateam-theme',d.v);if(d.v==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',d.v);render()},
+editMe:()=>{const m=meM();F.meName=m.name;F.meRole=m.role||'';app.editMe=true;render()},
+editMeCancel:()=>{app.editMe=false;render()},
+notMe:async()=>{const m=meM();lsSet('mecateam-me',null);lsSet('mecateam-skip-onboard',false);if(m&&m.uid&&m.uid===app.uid){try{await patch('team',m.id,{uid:null})}catch(e){}}render();openOnboard()},
+addMember:()=>{F.addingMember=true;render();setTimeout(()=>{const n=$('#nmn');n&&n.focus()},30)},
+addMemberCancel:()=>{F.addingMember=false;render()},
+onboard:()=>openOnboard(),
+obRole:d=>{F.obRole=d.v;const n=document.getElementById('obr');if(n)n.value=d.v;document.querySelectorAll('[data-a=obRole]').forEach(b=>b.classList.toggle('on',b.dataset.v===d.v))},
+obSkip:()=>{lsSet('mecateam-skip-onboard',true);app.fromQR=null;closeSheet()},
+iam:async d=>{const t=member(d.id);if(!t)return;app.fromQR=null;lsSet('mecateam-me',t.id);lsSet('mecateam-skip-onboard',false);closeSheet();
+if(app.uid&&!t.uid){try{await patch('team',t.id,{uid:app.uid})}catch(e){}}toast('Hola, '+t.name.split(' ')[0]);render()},
+askDemo:()=>{const n=COLS.reduce((s,c)=>s+S[c].filter(x=>x.demo).length,0);
+confirmBox('¿Borrar los datos de ejemplo?',`Se borran ${n} elementos de ejemplo (máquinas, trabajos, averías, mensajes y personas ficticias) para todo el equipo. Lo que hayáis creado vosotros se conserva.`,'Borrar ejemplos','dan',async()=>{
+const meDemo=meM()?.demo;let ok=0;
+for(const c of COLS){for(const x of S[c].filter(x=>x.demo)){try{await del(c,x.id);ok++}catch(e){return}}}
+if(meDemo)lsSet('mecateam-me',null);toast(ok+' datos de ejemplo borrados');onboardShown=false;render()})}
+};
+const SUBMIT={
+gotoCode:()=>A.gotoCode(),
+addNote:async()=>{const f=byId('faults',cur().id);const t=(F.note||'').trim();if(!f||!t||F.busyNote||!needMe())return;stopDict();F.busyNote=true;
+try{await patch('faults',f.id,{log:[...(f.log||[]),{t:Date.now(),by:myId(),x:t,note:true}].slice(-80)});F.note='';toast('Nota añadida')}catch(e){}F.busyNote=false;render()},
+saveEditFault:async()=>{const f=byId('faults',cur().id);if(!f)return;const title=(F.title||'').trim();if(!title){toast('El título no puede quedar vacío.','err');return}
+const data={title,description:(F.description||'').trim(),machineId:F.machineId||null};if(!data.machineId)data.stopped=false;
+try{await patch('faults',f.id,{...data,log:logE(f,'Datos editados')});back();toast('Avería actualizada')}catch(e){}},
+saveEditMant:async()=>{const x=byId('maintenances',cur().id);if(!x)return;const title=(F.title||'').trim();if(!title){toast('El título no puede quedar vacío.','err');return}
+try{await patch('maintenances',x.id,{type:F.type,title,description:(F.description||'').trim(),parts:(F.parts||'').trim(),durationMin:Math.max(0,parseInt(F.duration,10))||null,doneById:F.by||x.doneById});back();toast('Trabajo actualizado')}catch(e){}},
+saveMemberEdit:async()=>{const n=(F.emName||'').trim();if(!n||!F.emId){toast('Falta el nombre.','err');return}
+try{await patch('team',F.emId,{name:n,role:(F.emRole||'').trim()});closeSheet();toast('Ficha guardada');render()}catch(e){}},
+saveMachine:async()=>{const c=cur();const name=F.name.trim(),code=F.code.trim().toUpperCase();if(!name||!code){toast('El nombre y el código son obligatorios.','err');return}
+if(S.machines.some(m=>m.id!==c.id&&String(m.code).toUpperCase()===code)){toast('Ya hay una máquina con el código '+code+'.','err');return}
+const data={name,code,location:F.location.trim(),description:F.description.trim(),intervalDays:+F.interval||0};
+try{if(c.id){const m=byId('machines',c.id);await patch('machines',c.id,data);back();toast('Máquina guardada')}
+else{const id=rid();await put('machines',id,{...data,createdById:myId(),createdAt:Date.now(),lastMaintenanceAt:null,lastMaintenanceById:null,nextDueAt:null});replaceTop('maquina',{id});toast('Máquina creada')}}catch(e){}},
+saveFault:async()=>{if(F.busy)return;const title=F.title.trim();if(!title){toast('Describe la avería en pocas palabras.','err');return}
+F.busy=true;render();
+try{const photos=await uploadAll(F.photos);const id=rid(),now=Date.now();
+await put('faults',id,{title,description:F.description.trim(),machineId:F.machineId||null,priority:F.priority,stopped:!!(F.stopped&&F.machineId),status:'Abierta',photos,
+createdById:myId(),createdAt:now,assignedToId:null,resolution:'',closedAt:null,closedById:null,log:[{t:now,by:myId(),x:'Reportada'+(F.stopped?' con máquina parada':'')}]});
+if(F.notify){const m=byId('machines',F.machineId);await sysMsg(`ha reportado una avería ${F.priority.toLowerCase()}${F.stopped?' (máquina parada)':''}: ${title}${m?' — '+m.code+' '+m.name:''}`,'alert','averia',id)}
+replaceTop('averia',{id});toast('Avería reportada')}catch(e){F.busy=false;render();if(!e||!e.code)toast('No se han podido subir las fotos. Prueba con menos o más pequeñas.','err')}},
+saveMant:async()=>{if(F.busy)return;const c=cur();const m=byId('machines',F.machineId);
+if(!m){toast('Elige en qué máquina se ha hecho el trabajo.','err');return}
+if(!F.title.trim()){toast('Escribe un título corto, por ejemplo «Cambio de correa».','err');return}
+if(!F.by){toast('Indica quién ha hecho el trabajo.','err');return}
+F.busy=true;render();
+try{const photos=await uploadAll(F.photos);const now=new Date();const [yy,mo,dd]=F.date.split('-').map(Number);
+let doneAt=new Date(yy,mo-1,dd,12,0,0).getTime();if(sod(doneAt)===sod(now.getTime())||isNaN(doneAt))doneAt=now.getTime();if(doneAt>now.getTime())doneAt=now.getTime();
+const next=+F.next?doneAt+(+F.next)*DAY:null;const id=rid();const fault=c.fid?byId('faults',c.fid):null;
+await put('maintenances',id,{machineId:m.id,type:F.type,title:F.title.trim(),description:F.description.trim(),parts:F.parts.trim(),durationMin:Math.max(0,parseInt(F.duration,10))||null,
+photos,doneById:F.by,doneAt,nextDueAt:next,faultId:fault?fault.id:null,createdById:myId(),createdAt:Date.now()});
+if(!m.lastMaintenanceAt||m.lastMaintenanceAt<=doneAt){const upd={lastMaintenanceAt:doneAt,lastMaintenanceById:F.by};if(next||F.type==='Preventivo')upd.nextDueAt=next;await patch('machines',m.id,upd)}
+if(fault&&fault.status!=='Cerrada'){await patch('faults',fault.id,{status:'Cerrada',resolution:F.description.trim()||F.title.trim(),closedAt:Date.now(),closedById:F.by,maintId:id,log:logE(fault,'Cerrada con trabajo registrado')});
+await sysMsg('ha cerrado la avería «'+fault.title+'» con una reparación en '+m.code,'check','averia',fault.id)}
+else if(F.notify)await sysMsg(`ha registrado un ${F.type.toLowerCase()} en ${m.code}: ${F.title.trim()}`,'wrench','mant',id);
+replaceTop('mant',{id});toast('Mantenimiento guardado')}catch(e){F.busy=false;render();if(!e||!e.code)toast('No se han podido subir las fotos. Prueba con menos o más pequeñas.','err')}},
+sendMsg:async()=>{const t=(F.chat||'').trim();if(!t||F.sending||!needMe())return;F.sending=true;
+try{await put('messages',rid(),{kind:'user',text:t,photo:null,authorId:myId(),createdAt:Date.now()});F.chat='';chatSeen=-1}catch(e){}F.sending=false;render();const n=$('#chatIn');n&&n.focus()},
+saveMe:async()=>{const m=meM();if(!F.meName.trim()){toast('Falta el nombre.','err');return}try{await patch('team',m.id,{name:F.meName.trim(),role:F.meRole.trim()});app.editMe=false;toast('Perfil guardado');render()}catch(e){}},
+saveMember:async()=>{const n=(F.newName||'').trim();if(!n)return;try{await put('team',rid(),{name:n,role:(F.newRole||'').trim(),uid:null,createdAt:Date.now()});F.addingMember=false;F.newName='';F.newRole='';toast(n+' añadido al equipo');render()}catch(e){}},
+obNew:async()=>{const n=(F.obName||'').trim(),r=(F.obRole||'').trim();if(!n){toast('Escribe tu nombre.','err');return}if(!r){toast('Elige o escribe tu función.','err');return}
+if(S.team.some(t=>t.name.trim().toLowerCase()===n.toLowerCase()&&(!t.uid||t.uid===app.uid))){toast('Ya hay alguien llamado '+n+'. Si eres tú, elígelo en la lista.','err');return}
+const id=rid();
+try{await put('team',id,{name:n,role:r,uid:app.uid||null,createdAt:Date.now()});lsSet('mecateam-me',id);lsSet('mecateam-skip-onboard',false);app.fromQR=null;closeSheet();
+sysMsg('se ha unido al equipo como '+r,'userplus');toast('Bienvenido/a, '+n.split(' ')[0]);render()}catch(e){}}
+};
+const CHANGE={
+addPhotos:el=>{F.photos=F.photos||[];for(const f of el.files){if(!/^image\//.test(f.type))continue;F.photos.push({file:f,url:URL.createObjectURL(f)})}el.value='';render()},
+chatPhoto:async el=>{const f=el.files[0];el.value='';if(!f||!needMe())return;toast('Enviando foto…');
+try{const [id]=await uploadAll([{file:f}]);await put('messages',rid(),{kind:'user',text:(F.chat||'').trim(),photo:id,authorId:myId(),createdAt:Date.now()});F.chat='';chatSeen=-1;render()}catch(e){if(!e||!e.code)toast('No se ha podido enviar la foto.','err')}}
+};
+/* ---------- eventos ---------- */
+document.addEventListener('click',ev=>{
+const el=ev.target.closest('[data-a]');if(!el||el.tagName==='FORM')return;
+const fn=A[el.dataset.a];if(!fn)return;
+if(el.tagName==='BUTTON'&&el.type==='submit'&&el.form)return;
+ev.preventDefault();Promise.resolve(fn(el.dataset,el,ev)).catch(e=>console.error(e));
+});
+document.addEventListener('submit',ev=>{const f=ev.target;if(!f.dataset.a)return;ev.preventDefault();const fn=SUBMIT[f.dataset.a];fn&&Promise.resolve(fn()).catch(e=>console.error(e))});
+document.addEventListener('input',ev=>{
+const el=ev.target;
+if(el.dataset.f){F[el.dataset.f]=el.value;F.dirty=true;
+if(el.id==='chatIn'){const b=document.querySelector('.composer .send');if(b)b.disabled=!el.value.trim();el.style.height='auto';el.style.height=Math.min(140,el.scrollHeight)+'px'}}
+if(el.dataset.q!==undefined){app.q[el.dataset.q]=el.value;if(el.dataset.q!=='goto')schedule()}
+});
+document.addEventListener('change',ev=>{const el=ev.target;if(el.dataset.aChange&&CHANGE[el.dataset.aChange])CHANGE[el.dataset.aChange](el);if(el.tagName==='SELECT'&&el.dataset.f){F[el.dataset.f]=el.value;if(cur().v==='nuevo-mant'&&el.dataset.f==='machineId'&&F.type==='Preventivo'){const m=byId('machines',el.value);if(m&&m.intervalDays)F.next=m.intervalDays}render()}});
+document.addEventListener('keydown',ev=>{
+if(ev.key==='Escape'&&$('#ovl').innerHTML){closeSheet();return}
+if(ev.key==='Enter'&&!ev.shiftKey&&ev.target.id==='chatIn'&&matchMedia('(pointer:fine)').matches){ev.preventDefault();SUBMIT.sendMsg()}
+});
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(/^maq-/.test(h)){app.stack=[{v:'maquinas'},{v:'maquina',id:h.slice(4)}];app.fromQR=h.slice(4);if(!meM()&&!app.readOnly)onboardShown=false;render()}});
+document.addEventListener('error',ev=>{const t=ev.target;if(t&&t.tagName==='IMG'&&t.closest('.photos,.bub')){const d=document.createElement('div');d.className='ph';d.textContent='Foto no disponible';t.replaceWith(d)}},true);
+boot();
+</script>
+</body></html>
