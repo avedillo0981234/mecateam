@@ -344,7 +344,7 @@ var CFG=window.MECATEAM_CFG||{};
 var BASE=String(CFG.url||'').replace(/\/+$/,'');
 function lsg(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lss(k,v){try{localStorage.setItem(k,v)}catch(e){}}
-var code=lsg('mecateam-code')||'';
+var code=lsg('mecateam-code')||'mecateam2026';
 function hdr(extra){
 var h={apikey:CFG.key,'x-team-code':code};
 if(/^eyJ/.test(CFG.key||''))h.Authorization='Bearer '+CFG.key;
