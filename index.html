@@ -495,7 +495,15 @@ const hrs=min=>(min/60).toLocaleString('es-ES',{maximumFractionDigits:1});
 function longDate(ms){const d=new Date(ms);return DIAS[d.getDay()]+' '+d.getDate()+' de '+MESES[d.getMonth()]}
 function initials(n){return String(n||'?').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'?'}
 function avColor(n){let h=0;for(const c of String(n||''))h=(31*h+c.charCodeAt(0))>>>0;return AV_C[h%AV_C.length]}
-const av=(name,size)=>`<span class="av" style="background:${avColor(name)}${size?`;width:${size}px;height:${size}px;font-size:${Math.round(size*.38)}px`:''}">${esc(initials(name))}</span>`;
+const AV_COL=['#2A63CC','#1B8653','#7650C2','#C9661A','#1C8794','#C9372C','#5C6F82','#D4A017','#E0559B','#16202A'];
+const AV_E=['😀','😎','🤖','🦊','🐱','🐶','🦁','🐼','🐸','🦉','🚀','⚙️','🔧','🛠️','⚡','🔥','🌟','🎧','🏍️','☕','🍀','🦾'];
+const avH=(name,c,e,size)=>{const fs=size?Math.round(size*(e?.52:.38)):(e?18:13);return `<span class="av" style="background:${c||avColor(name)}${size?`;width:${size}px;height:${size}px`:''};font-size:${fs}px">${e?e:esc(initials(name))}</span>`};
+const av=(name,size)=>{const t=(typeof S!=='undefined'&&S.team||[]).find(x=>x.name===name),a=(t&&t.avatar)||{};return avH(name,a.c,a.e,size)};
+const avPick=(name,c,e)=>`<div class="fld"><span class="lbl">Avatar</span><div id="avw">${avPickIn(name,c,e)}</div></div>`;
+const avPickIn=(name,c,e)=>`<div style="display:flex;align-items:center;gap:12px;margin:8px 0">${avH(name,c,e,56)}<small>Elige color y emoji, o deja las iniciales</small></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">${AV_COL.map(k=>`<button type="button" data-a="pickAvC" data-v="${k}" aria-label="Color" style="width:32px;height:32px;border-radius:50%;background:${k};border:3px solid ${k===c?'var(--ink)':'transparent'}"></button>`).join('')}</div>
+<div style="display:flex;flex-wrap:wrap;gap:6px"><button type="button" data-a="pickAvE" data-v="" style="min-width:40px;height:40px;border-radius:10px;border:2px solid ${!e?'var(--ink)':'var(--line)'};background:var(--surface);color:var(--ink);font-weight:700">Aa</button>${AV_E.map(k=>`<button type="button" data-a="pickAvE" data-v="${k}" style="width:40px;height:40px;border-radius:10px;font-size:22px;border:2px solid ${k===e?'var(--ink)':'var(--line)'};background:var(--surface)">${k}</button>`).join('')}</div>`;
+const avRef=()=>{const w=document.getElementById('avw');if(w)w.innerHTML=avPickIn(F.avN,F.avC||'',F.avE||'')};
 const badge=(l,c,cls='')=>`<span class="badge ${cls}" style="--c:var(--${c})">${esc(l)}</span>`;
 const plural=(n,a,b)=>n+' '+(n===1?a:b);
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
@@ -1101,6 +1109,7 @@ let me='';
 if(m){const s=st(m.id),month=S.maintenances.filter(x=>x.doneById===m.id&&x.doneAt>=monthStart).length;
 if(app.editMe)me=`<form class="card" data-a="saveMe"><div class="fld"><label for="men">Nombre</label><input class="inp" id="men" data-f="meName" value="${esc(F.meName)}" required></div>
 <div class="fld"><label for="mer">Puesto</label><input class="inp" id="mer" data-f="meRole" value="${esc(F.meRole)}" placeholder="Técnico mecatrónico"></div>
+${avPick(F.meName,F.avC,F.avE)}
 <div class="btns"><button type="button" class="btn" data-a="editMeCancel">Cancelar</button><button class="btn pri" type="submit">${ic('check')}Guardar</button></div></form>`;
 else me=`<div class="card"><div class="me-card">${av(m.name,60)}<div class="grow"><div class="t" style="font-size:20px">${esc(m.name)}</div><div class="sub">${esc(m.role||'Sin puesto')}</div></div><button class="btn sm" data-w data-a="editMe">${ic('edit')}Editar</button></div>
 <div class="kpis" style="margin-top:14px;grid-template-columns:repeat(3,minmax(0,1fr))"><div class="kpi"><div class="n num">${month}</div><div class="l">Este mes</div></div><div class="kpi"><div class="n num">${s.n}</div><div class="l">Trabajos totales</div></div><div class="kpi"><div class="n num" style="color:var(--${s.o?'orange':'ink'})">${s.o}</div><div class="l">Averías asignadas</div></div></div>
@@ -1209,11 +1218,12 @@ dictKey=d.k;dictEl=d.el;dictState='listening';paintMic();
 let p;try{p=DICT.start()}catch(e){p=Promise.reject(e)}
 Promise.resolve(p).catch(e=>{const c=(e&&(e.code||e.reason||e.message))||'';dictKey=null;dictEl=null;dictState='idle';
 if(String(c).includes('not_granted')){DICT=null;toast('Sin permiso de micrófono: puedes seguir escribiendo.');render()}else{paintMic();if(!String(c).includes('dismissed'))toast('No se ha podido usar el dictado.','err')}})},
-editMember:d=>{const t=member(d.id);if(!t)return;F.emName=t.name;F.emRole=t.role||'';F.emId=t.id;
+editMember:d=>{const t=member(d.id);if(!t)return;F.avN=t.name;F.avC=(t.avatar&&t.avatar.c)||'';F.avE=(t.avatar&&t.avatar.e)||'';F.emName=t.name;F.emRole=t.role||'';F.emId=t.id;
 const s=S.maintenances.filter(x=>x.doneById===t.id).length;
 sheet(`<h3>${esc(t.name)}</h3><p>${plural(s,'trabajo registrado','trabajos registrados')}${t.uid?' · cuenta vinculada':''}</p>
 <form data-a="saveMemberEdit"><div class="fld"><label for="emn">Nombre</label><input class="inp" id="emn" data-f="emName" value="${esc(F.emName)}" required></div>
 <div class="fld"><label for="emr">Puesto</label><input class="inp" id="emr" data-f="emRole" value="${esc(F.emRole)}" placeholder="Técnico mecatrónico"></div>
+${avPick(t.name,F.avC,F.avE)}
 <div class="btns"><button type="button" class="btn" data-a="ovCloseBtn">Cancelar</button><button class="btn pri" type="submit">${ic('check')}Guardar</button></div></form>
 <button class="btn ghost full" style="color:var(--red);margin-top:10px" data-a="askDelMember" data-id="${esc(t.id)}">${ic('trash')}Quitar del equipo</button>`)},
 askDelMember:d=>{const t=member(d.id);if(!t)return;
@@ -1273,8 +1283,10 @@ csv:async d=>{const names={maintenances:'mantenimientos',faults:'averias',machin
 if(await saveFile(`mecateam-${names[d.v]}-${day.getFullYear()}${pad(day.getMonth()+1)}${pad(day.getDate())}.csv`,csvOf(d.v)))toast('Archivo descargado')},
 // equipo
 theme:d=>{lsSet('mecateam-theme',d.v);if(d.v==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',d.v);render()},
-editMe:()=>{const m=meM();F.meName=m.name;F.meRole=m.role||'';app.editMe=true;render()},
+editMe:()=>{const m=meM();F.avN=m.name;F.avC=(m.avatar&&m.avatar.c)||'';F.avE=(m.avatar&&m.avatar.e)||'';F.meName=m.name;F.meRole=m.role||'';app.editMe=true;render()},
 editMeCancel:()=>{app.editMe=false;render()},
+pickAvC:d=>{F.avC=d.v;avRef()},
+  pickAvE:d=>{F.avE=d.v;avRef()},
 notMe:async()=>{const m=meM();lsSet('mecateam-me',null);lsSet('mecateam-skip-onboard',false);if(m&&m.uid&&m.uid===app.uid){try{await patch('team',m.id,{uid:null})}catch(e){}}render();openOnboard()},
 addMember:()=>{F.addingMember=true;render();setTimeout(()=>{const n=$('#nmn');n&&n.focus()},30)},
 addMemberCancel:()=>{F.addingMember=false;render()},
@@ -1299,7 +1311,7 @@ try{await patch('faults',f.id,{...data,log:logE(f,'Datos editados')});back();toa
 saveEditMant:async()=>{const x=byId('maintenances',cur().id);if(!x)return;const title=(F.title||'').trim();if(!title){toast('El título no puede quedar vacío.','err');return}
 try{await patch('maintenances',x.id,{type:F.type,title,description:(F.description||'').trim(),parts:(F.parts||'').trim(),durationMin:Math.max(0,parseInt(F.duration,10))||null,doneById:F.by||x.doneById});back();toast('Trabajo actualizado')}catch(e){}},
 saveMemberEdit:async()=>{const n=(F.emName||'').trim();if(!n||!F.emId){toast('Falta el nombre.','err');return}
-try{await patch('team',F.emId,{name:n,role:(F.emRole||'').trim()});closeSheet();toast('Ficha guardada');render()}catch(e){}},
+try{await patch('team',F.emId,{name:n,role:(F.emRole||'').trim(),avatar:{c:F.avC||'',e:F.avE||''}});closeSheet();toast('Ficha guardada');render()}catch(e){}},
 saveMachine:async()=>{const c=cur();const name=F.name.trim(),code=F.code.trim().toUpperCase();if(!name||!code){toast('El nombre y el código son obligatorios.','err');return}
 if(S.machines.some(m=>m.id!==c.id&&String(m.code).toUpperCase()===code)){toast('Ya hay una máquina con el código '+code+'.','err');return}
 const data={name,code,location:F.location.trim(),description:F.description.trim(),intervalDays:+F.interval||0};
@@ -1329,7 +1341,7 @@ else if(F.notify)await sysMsg(`ha registrado un ${F.type.toLowerCase()} en ${m.c
 replaceTop('mant',{id});toast('Mantenimiento guardado')}catch(e){F.busy=false;render();if(!e||!e.code)toast('No se han podido subir las fotos. Prueba con menos o más pequeñas.','err')}},
 sendMsg:async()=>{const t=(F.chat||'').trim();if(!t||F.sending||!needMe())return;F.sending=true;
 try{await put('messages',rid(),{kind:'user',text:t,photo:null,authorId:myId(),createdAt:Date.now()});F.chat='';chatSeen=-1}catch(e){}F.sending=false;render();const n=$('#chatIn');n&&n.focus()},
-saveMe:async()=>{const m=meM();if(!F.meName.trim()){toast('Falta el nombre.','err');return}try{await patch('team',m.id,{name:F.meName.trim(),role:F.meRole.trim()});app.editMe=false;toast('Perfil guardado');render()}catch(e){}},
+saveMe:async()=>{const m=meM();if(!F.meName.trim()){toast('Falta el nombre.','err');return}try{await patch('team',m.id,{name:F.meName.trim(),role:F.meRole.trim(),avatar:{c:F.avC||'',e:F.avE||''}});app.editMe=false;toast('Perfil guardado');render()}catch(e){}},
 saveMember:async()=>{const n=(F.newName||'').trim();if(!n)return;try{await put('team',rid(),{name:n,role:(F.newRole||'').trim(),uid:null,createdAt:Date.now()});F.addingMember=false;F.newName='';F.newRole='';toast(n+' añadido al equipo');render()}catch(e){}},
 obNew:async()=>{const n=(F.obName||'').trim(),r=(F.obRole||'').trim();if(!n){toast('Escribe tu nombre.','err');return}if(!r){toast('Elige o escribe tu función.','err');return}
 if(S.team.some(t=>t.name.trim().toLowerCase()===n.toLowerCase()&&(!t.uid||t.uid===app.uid))){toast('Ya hay alguien llamado '+n+'. Si eres tú, elígelo en la lista.','err');return}
